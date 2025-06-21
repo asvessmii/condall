@@ -173,9 +173,12 @@ const ProductFilters = ({ products, filters, onFiltersChange, onReset }) => {
     });
   };
 
-  const activeFiltersCount = Object.values(filters).filter(v => 
-    v && (typeof v === 'string' ? v.length > 0 : Object.values(v).some(val => val))
-  ).length;
+  const activeFiltersCount = Object.entries(filters).filter(([key, value]) => {
+    if (key === 'priceRange') {
+      return value.min || value.max;
+    }
+    return value && value.length > 0;
+  }).length;
 
   return (
     <div className="filters-container">

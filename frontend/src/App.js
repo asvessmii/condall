@@ -138,15 +138,189 @@ const ProductDetailsModal = ({ product, onClose, onAddToCart }) => {
   );
 };
 
+// Filters Component
+const ProductFilters = ({ products, filters, onFiltersChange, onReset }) => {
+  const [showFilters, setShowFilters] = useState(false);
+
+  // Extract unique values for filters
+  const brands = [...new Set(products.map(p => {
+    const brandMatch = p.name.match(/^([A-Za-z\s]+)/);
+    return brandMatch ? brandMatch[1].trim() : 'Другие';
+  }))];
+
+  const powerOptions = [...new Set(products.map(p => {
+    const power = p.specifications?.['Мощность охлаждения'];
+    return power ? power.replace(' кВт', '') : null;
+  }).filter(Boolean))].sort((a, b) => parseFloat(a) - parseFloat(b));
+
+  const areaOptions = [...new Set(products.map(p => {
+    const area = p.specifications?.['Площадь помещения'];
+    return area ? area.replace(' м²', '') : null;
+  }).filter(Boolean))].sort((a, b) => parseInt(a) - parseInt(b));
+
+  const efficiencyClasses = [...new Set(products.map(p => 
+    p.specifications?.['Класс энергоэффективности']
+  ).filter(Boolean))];
+
+  const handleFilterChange = (key, value) => {
+    onFiltersChange({ ...filters, [key]: value });
+  };
+
+  const handlePriceChange = (key, value) => {
+    onFiltersChange({
+      ...filters,
+      priceRange: { ...filters.priceRange, [key]: value }
+    });
+  };
+
+  const activeFiltersCount = Object.values(filters).filter(v => 
+    v && (typeof v === 'string' ? v.length > 0 : Object.values(v).some(val => val))
+  ).length;
+
+  return (
+    <div className="filters-container">
+      <div className="filters-header">
+        <div className="search-container">
+          <input
+            type="text"
+            placeholder="Поиск кондиционеров..."
+            value={filters.search || ''}
+            onChange={(e) => handleFilterChange('search', e.target.value)}
+            className="search-input"
+          />
+          <span className="search-icon">🔍</span>
+        </div>
+        <button
+          onClick={() => setShowFilters(!showFilters)}
+          className={`filters-toggle ${activeFiltersCount > 0 ? 'has-filters' : ''}`}
+        >
+          <span>Фильтры</span>
+          {activeFiltersCount > 0 && (
+            <span className="filters-count">{activeFiltersCount}</span>
+          )}
+          <span className={`toggle-icon ${showFilters ? 'open' : ''}`}>▼</span>
+        </button>
+      </div>
+
+      {showFilters && (
+        <div className="filters-panel">
+          <div className="filters-grid">
+            {/* Brand Filter */}
+            <div className="filter-group">
+              <label className="filter-label">Производитель</label>
+              <select
+                value={filters.brand || ''}
+                onChange={(e) => handleFilterChange('brand', e.target.value)}
+                className="filter-select"
+              >
+                <option value="">Все производители</option>
+                {brands.map(brand => (
+                  <option key={brand} value={brand}>{brand}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Power Filter */}
+            <div className="filter-group">
+              <label className="filter-label">Мощность охлаждения</label>
+              <select
+                value={filters.power || ''}
+                onChange={(e) => handleFilterChange('power', e.target.value)}
+                className="filter-select"
+              >
+                <option value="">Любая мощность</option>
+                {powerOptions.map(power => (
+                  <option key={power} value={power}>{power} кВт</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Area Filter */}
+            <div className="filter-group">
+              <label className="filter-label">Площадь помещения</label>
+              <select
+                value={filters.area || ''}
+                onChange={(e) => handleFilterChange('area', e.target.value)}
+                className="filter-select"
+              >
+                <option value="">Любая площадь</option>
+                {areaOptions.map(area => (
+                  <option key={area} value={area}>{area} м²</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Efficiency Filter */}
+            <div className="filter-group">
+              <label className="filter-label">Класс энергоэффективности</label>
+              <select
+                value={filters.efficiency || ''}
+                onChange={(e) => handleFilterChange('efficiency', e.target.value)}
+                className="filter-select"
+              >
+                <option value="">Любой класс</option>
+                {efficiencyClasses.map(cls => (
+                  <option key={cls} value={cls}>{cls}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Price Range Filter */}
+            <div className="filter-group filter-group-wide">
+              <label className="filter-label">Цена, ₽</label>
+              <div className="price-range">
+                <input
+                  type="number"
+                  placeholder="От"
+                  value={filters.priceRange?.min || ''}
+                  onChange={(e) => handlePriceChange('min', e.target.value)}
+                  className="price-input"
+                />
+                <span className="price-separator">—</span>
+                <input
+                  type="number"
+                  placeholder="До"
+                  value={filters.priceRange?.max || ''}
+                  onChange={(e) => handlePriceChange('max', e.target.value)}
+                  className="price-input"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="filters-actions">
+            <button onClick={onReset} className="btn btn-secondary btn-small">
+              Сбросить
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
 // Catalog Section
 const Catalog = ({ onAddToCart }) => {
   const [products, setProducts] = useState([]);
+  const [filteredProducts, setFilteredProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [filters, setFilters] = useState({
+    search: '',
+    brand: '',
+    power: '',
+    area: '',
+    efficiency: '',
+    priceRange: { min: '', max: '' }
+  });
 
   useEffect(() => {
     fetchProducts();
   }, []);
+
+  useEffect(() => {
+    applyFilters();
+  }, [products, filters]);
 
   const fetchProducts = async () => {
     try {
@@ -157,6 +331,80 @@ const Catalog = ({ onAddToCart }) => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const applyFilters = () => {
+    let filtered = [...products];
+
+    // Search filter
+    if (filters.search) {
+      const searchTerm = filters.search.toLowerCase();
+      filtered = filtered.filter(product =>
+        product.name.toLowerCase().includes(searchTerm) ||
+        product.description.toLowerCase().includes(searchTerm) ||
+        product.short_description.toLowerCase().includes(searchTerm)
+      );
+    }
+
+    // Brand filter
+    if (filters.brand) {
+      filtered = filtered.filter(product => {
+        const brandMatch = product.name.match(/^([A-Za-z\s]+)/);
+        const productBrand = brandMatch ? brandMatch[1].trim() : 'Другие';
+        return productBrand === filters.brand;
+      });
+    }
+
+    // Power filter
+    if (filters.power) {
+      filtered = filtered.filter(product => {
+        const power = product.specifications?.['Мощность охлаждения'];
+        return power && power.includes(filters.power);
+      });
+    }
+
+    // Area filter
+    if (filters.area) {
+      filtered = filtered.filter(product => {
+        const area = product.specifications?.['Площадь помещения'];
+        return area && area.includes(filters.area);
+      });
+    }
+
+    // Efficiency filter
+    if (filters.efficiency) {
+      filtered = filtered.filter(product => {
+        const efficiency = product.specifications?.['Класс энергоэффективности'];
+        return efficiency === filters.efficiency;
+      });
+    }
+
+    // Price range filter
+    if (filters.priceRange.min || filters.priceRange.max) {
+      filtered = filtered.filter(product => {
+        const price = product.price;
+        const min = filters.priceRange.min ? parseFloat(filters.priceRange.min) : 0;
+        const max = filters.priceRange.max ? parseFloat(filters.priceRange.max) : Infinity;
+        return price >= min && price <= max;
+      });
+    }
+
+    setFilteredProducts(filtered);
+  };
+
+  const handleFiltersChange = (newFilters) => {
+    setFilters(newFilters);
+  };
+
+  const handleResetFilters = () => {
+    setFilters({
+      search: '',
+      brand: '',
+      power: '',
+      area: '',
+      efficiency: '',
+      priceRange: { min: '', max: '' }
+    });
   };
 
   if (loading) {
@@ -171,16 +419,45 @@ const Catalog = ({ onAddToCart }) => {
   return (
     <div className="section">
       <div className="section-content">
-        <div className="products-grid">
-          {products.map(product => (
-            <ProductCard
-              key={product.id}
-              product={product}
-              onViewDetails={setSelectedProduct}
-              onAddToCart={onAddToCart}
-            />
-          ))}
+        <ProductFilters
+          products={products}
+          filters={filters}
+          onFiltersChange={handleFiltersChange}
+          onReset={handleResetFilters}
+        />
+        
+        <div className="products-header">
+          <h2 className="products-title">
+            {filteredProducts.length === products.length 
+              ? `Все товары (${products.length})`
+              : `Найдено: ${filteredProducts.length} из ${products.length}`
+            }
+          </h2>
         </div>
+
+        {filteredProducts.length === 0 ? (
+          <div className="no-results">
+            <div className="no-results-icon">🔍</div>
+            <h3 className="no-results-title">Товары не найдены</h3>
+            <p className="no-results-text">
+              Попробуйте изменить параметры поиска или сбросить фильтры
+            </p>
+            <button onClick={handleResetFilters} className="btn btn-primary">
+              Сбросить фильтры
+            </button>
+          </div>
+        ) : (
+          <div className="products-grid">
+            {filteredProducts.map(product => (
+              <ProductCard
+                key={product.id}
+                product={product}
+                onViewDetails={setSelectedProduct}
+                onAddToCart={onAddToCart}
+              />
+            ))}
+          </div>
+        )}
       </div>
       <ProductDetailsModal
         product={selectedProduct}

@@ -2,6 +2,13 @@ import requests
 import unittest
 import os
 import json
+import sys
+import asyncio
+from unittest.mock import patch, MagicMock, AsyncMock
+import base64
+from io import BytesIO
+from PIL import Image
+import importlib.util
 from datetime import datetime
 
 # Get the backend URL from the frontend .env file
@@ -12,6 +19,9 @@ with open('/app/frontend/.env', 'r') as f:
             break
 
 API_URL = f"{BACKEND_URL}/api"
+
+# Add backend directory to path to import telegram_admin
+sys.path.append('/app/backend')
 
 class AirConditionerShopAPITest(unittest.TestCase):
     """Test suite for the Air Conditioner Shop API"""

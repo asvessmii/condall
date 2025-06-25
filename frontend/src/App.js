@@ -849,8 +849,19 @@ const Cart = ({ cartItems, onRemoveItem, onUpdateQuantity, onClearCart }) => {
 function App() {
   const [activeSection, setActiveSection] = useState('catalog');
   const [cartItems, setCartItems] = useState([]);
+  const [telegramWebApp, setTelegramWebApp] = useState(null);
+  const [telegramUser, setTelegramUser] = useState(null);
 
   useEffect(() => {
+    // Initialize Telegram Web App
+    const tg = initTelegramWebApp();
+    setTelegramWebApp(tg);
+    
+    const user = getTelegramUser();
+    setTelegramUser(user);
+    
+    console.log('Telegram User:', user);
+    
     fetchCartItems();
     initializeData();
   }, []);

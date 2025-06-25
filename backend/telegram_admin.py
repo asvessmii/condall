@@ -381,6 +381,53 @@ async def photo_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "Хотите добавить еще изображения?",
             reply_markup=reply_markup
         )
+    
+    elif action.startswith("edit_product_image_"):
+        # Download photo
+        photo = update.message.photo[-1]
+        file = await context.bot.get_file(photo.file_id)
+        
+        # Convert to base64
+        photo_bytes = await file.download_as_bytearray()
+        image_base64 = base64.b64encode(photo_bytes).decode('utf-8')
+        
+        product_id = action.replace("edit_product_image_", "")
+        await db.products.update_one(
+            {"id": product_id}, 
+            {"$set": {"image_url": f"data:image/jpeg;base64,{image_base64}"}}
+        )
+        admin_state.clear_state(user_id)
+        await update.message.reply_text(
+            "✅ Изображение товара обновлено!",
+            reply_markup=get_main_menu_keyboard()
+        )
+    
+    elif action.startswith("edit_project_images_"):
+        # Download photo
+        photo = update.message.photo[-1]
+        file = await context.bot.get_file(photo.file_id)
+        
+        # Convert to base64
+        photo_bytes = await file.download_as_bytearray()
+        image_base64 = base64.b64encode(photo_bytes).decode('utf-8')
+        
+        # Add to new images list
+        new_images = admin_state.get_state(user_id).get("new_project_images", [])
+        new_images.append(f"data:image/jpeg;base64,{image_base64}")
+        admin_state.set_state(user_id, "new_project_images", new_images)
+        
+        # Ask for more images or finish
+        keyboard = [
+            [InlineKeyboardButton("✅ Завершить", callback_data="finish_project_images")],
+            [InlineKeyboardButton("➕ Добавить еще фото", callback_data="continue_project_images")]
+        ]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        
+        await update.message.reply_text(
+            f"📷 Изображение добавлено! Всего: {len(new_images)}\n\n"
+            "Хотите добавить еще изображения?",
+            reply_markup=reply_markup
+        )
 
 
 async def list_products(query):

@@ -5,6 +5,32 @@ import axios from 'axios';
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
+// Telegram Web App initialization
+const initTelegramWebApp = () => {
+  if (window.Telegram?.WebApp) {
+    const tg = window.Telegram.WebApp;
+    tg.ready();
+    tg.expand();
+    tg.enableClosingConfirmation();
+    
+    // Set theme
+    tg.setHeaderColor('#2196F3');
+    tg.setBackgroundColor('#ffffff');
+    
+    console.log('Telegram Web App initialized');
+    return tg;
+  }
+  return null;
+};
+
+// Get Telegram user data
+const getTelegramUser = () => {
+  if (window.Telegram?.WebApp?.initDataUnsafe?.user) {
+    return window.Telegram.WebApp.initDataUnsafe.user;
+  }
+  return null;
+};
+
 // Bottom Navigation Component
 const BottomNavigation = ({ activeSection, setActiveSection, cartCount }) => {
   const menuItems = [

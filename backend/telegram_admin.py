@@ -74,6 +74,7 @@ async def check_admin(update: Update) -> bool:
 def get_main_menu_keyboard():
     """Get main menu keyboard"""
     keyboard = [
+        [InlineKeyboardButton("🌐 Открыть сайт", web_app={"url": "https://05c28984-a577-49c4-83bb-343ff2ec9346.preview.emergentagent.com"})],
         [InlineKeyboardButton("📦 Управление товарами", callback_data="manage_products")],
         [InlineKeyboardButton("🏗️ Управление проектами", callback_data="manage_projects")],
         [InlineKeyboardButton("📊 Статистика", callback_data="statistics")]

@@ -635,6 +635,65 @@ async def show_statistics(query):
     )
 
 
+async def finish_project_creation(query, user_id: int):
+    """Finish creating a new project"""
+    project_data = admin_state.get_state(user_id).get("new_project", {})
+    
+    if not project_data.get("images"):
+        await query.edit_message_text(
+            "❌ Проект должен содержать хотя бы одно изображение!",
+            reply_markup=get_back_keyboard()
+        )
+        return
+    
+    # Generate UUID for project
+    import uuid
+    project_data["id"] = str(uuid.uuid4())
+    project_data["created_at"] = datetime.utcnow()
+    
+    # Save to database
+    await db.projects.insert_one(project_data)
+    
+    admin_state.clear_state(user_id)
+    await query.edit_message_text(
+        f"✅ Проект '{project_data['title']}' успешно добавлен!",
+        reply_markup=get_main_menu_keyboard()
+    )
+
+
+async def finish_project_images_edit(query, user_id: int):
+    """Finish editing project images"""
+    editing_project = admin_state.get_state(user_id).get("editing_project", {})
+    new_images = admin_state.get_state(user_id).get("new_project_images", [])
+    
+    if not new_images:
+        await query.edit_message_text(
+            "❌ Не добавлено ни одного изображения!",
+            reply_markup=get_back_keyboard()
+        )
+        return
+    
+    project_id = editing_project.get("id")
+    if not project_id:
+        await query.edit_message_text(
+            "❌ Ошибка: проект не найден!",
+            reply_markup=get_back_keyboard()
+        )
+        return
+    
+    # Update project with new images
+    await db.projects.update_one(
+        {"id": project_id}, 
+        {"$set": {"images": new_images}}
+    )
+    
+    admin_state.clear_state(user_id)
+    await query.edit_message_text(
+        f"✅ Изображения проекта обновлены! Добавлено: {len(new_images)}",
+        reply_markup=get_main_menu_keyboard()
+    )
+
+
 async def start_product_edit(query, product_id: str):
     """Start editing a product"""
     user_id = query.from_user.id

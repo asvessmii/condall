@@ -890,9 +890,10 @@ function App() {
         quantity: 1
       });
       fetchCartItems();
+      
       // Добавляем haptic feedback для Telegram
-      if (window.Telegram?.WebApp?.HapticFeedback) {
-        window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
+      if (telegramWebApp?.HapticFeedback) {
+        telegramWebApp.HapticFeedback.impactOccurred('light');
       }
       
       // Показываем уведомление

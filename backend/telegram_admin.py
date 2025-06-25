@@ -6,6 +6,7 @@ from typing import Dict, Any, List, Optional
 import base64
 import io
 from PIL import Image
+from dotenv import load_dotenv
 
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, InputMediaPhoto
 from telegram.ext import Application, CommandHandler, CallbackQueryHandler, MessageHandler, filters, ContextTypes
@@ -13,6 +14,9 @@ from telegram.constants import ParseMode
 
 from motor.motor_asyncio import AsyncIOMotorClient
 from pydantic import BaseModel
+
+# Load environment variables
+load_dotenv()
 
 
 # Configure logging

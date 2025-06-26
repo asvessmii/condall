@@ -253,6 +253,28 @@ async def init_sample_data():
     if existing_products > 0:
         return {"message": "Данные уже инициализированы", "products_count": existing_products}
     
+    # Попытка восстановления из резервной копии
+    if DatabaseBackup:
+        backup = DatabaseBackup()
+        try:
+            # Проверяем, есть ли резервная копия
+            backup_dir = Path(__file__).parent / 'data'
+            if (backup_dir / 'products.json').exists():
+                logger.info("Найдена резервная копия, восстанавливаем данные...")
+                success = await backup.restore_backup()
+                if success:
+                    products_count = await db.products.count_documents({})
+                    projects_count = await db.projects.count_documents({})
+                    return {
+                        "message": "Данные успешно восстановлены из резервной копии", 
+                        "products_count": products_count,
+                        "projects_count": projects_count
+                    }
+        except Exception as e:
+            logger.error(f"Ошибка при восстановлении из резервной копии: {e}")
+        finally:
+            await backup.close()
+    
     # Check if this is a manual initialization (from admin)
     # For now, we disable automatic initialization completely
     return {"message": "Автоматическая инициализация отключена", "products_count": existing_products}

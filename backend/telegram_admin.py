@@ -65,8 +65,19 @@ admin_state = AdminState()
 async def check_admin(update: Update) -> bool:
     """Check if user is admin"""
     user_id = update.effective_user.id
+    username = update.effective_user.username or "Unknown"
+    first_name = update.effective_user.first_name or "Unknown"
+    
+    # Log user info for debugging
+    logger.info(f"User trying to access: ID={user_id}, Username=@{username}, Name={first_name}")
+    
     if user_id != ADMIN_ID:
-        await update.message.reply_text("❌ У вас нет прав доступа к админ панели")
+        await update.message.reply_text(
+            f"❌ У вас нет прав доступа к админ панели\n\n"
+            f"🆔 Ваш ID: {user_id}\n"
+            f"👤 Имя: {first_name}\n"
+            f"📞 Обратитесь к администратору для получения доступа"
+        )
         return False
     return True
 

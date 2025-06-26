@@ -244,6 +244,73 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "📷 Отправьте еще одно изображение проекта:",
             parse_mode=ParseMode.MARKDOWN
         )
+    
+    # Product editing handlers
+    elif data.startswith("edit_product_name_"):
+        product_id = data.replace("edit_product_name_", "")
+        user_id = query.from_user.id
+        admin_state.set_action(user_id, f"edit_product_name_{product_id}")
+        await query.edit_message_text("📝 Введите новое название товара:")
+    
+    elif data.startswith("edit_product_short_desc_"):
+        product_id = data.replace("edit_product_short_desc_", "")
+        user_id = query.from_user.id
+        admin_state.set_action(user_id, f"edit_product_short_desc_{product_id}")
+        await query.edit_message_text("📝 Введите новое краткое описание товара:")
+    
+    elif data.startswith("edit_product_desc_"):
+        product_id = data.replace("edit_product_desc_", "")
+        user_id = query.from_user.id
+        admin_state.set_action(user_id, f"edit_product_desc_{product_id}")
+        await query.edit_message_text("📝 Введите новое подробное описание товара:")
+    
+    elif data.startswith("edit_product_price_"):
+        product_id = data.replace("edit_product_price_", "")
+        user_id = query.from_user.id
+        admin_state.set_action(user_id, f"edit_product_price_{product_id}")
+        await query.edit_message_text("💰 Введите новую цену товара:")
+    
+    elif data.startswith("edit_product_specs_"):
+        product_id = data.replace("edit_product_specs_", "")
+        user_id = query.from_user.id
+        admin_state.set_action(user_id, f"edit_product_specs_{product_id}")
+        await query.edit_message_text(
+            "⚙️ Введите новые характеристики товара в формате:\n"
+            "Характеристика1: Значение1\n"
+            "Характеристика2: Значение2"
+        )
+    
+    elif data.startswith("edit_product_image_"):
+        product_id = data.replace("edit_product_image_", "")
+        user_id = query.from_user.id
+        admin_state.set_action(user_id, f"edit_product_image_{product_id}")
+        await query.edit_message_text("📷 Отправьте новое изображение товара:")
+    
+    # Project editing handlers
+    elif data.startswith("edit_project_title_"):
+        project_id = data.replace("edit_project_title_", "")
+        user_id = query.from_user.id
+        admin_state.set_action(user_id, f"edit_project_title_{project_id}")
+        await query.edit_message_text("📝 Введите новое название проекта:")
+    
+    elif data.startswith("edit_project_desc_"):
+        project_id = data.replace("edit_project_desc_", "")
+        user_id = query.from_user.id
+        admin_state.set_action(user_id, f"edit_project_desc_{project_id}")
+        await query.edit_message_text("📝 Введите новое описание проекта:")
+    
+    elif data.startswith("edit_project_address_"):
+        project_id = data.replace("edit_project_address_", "")
+        user_id = query.from_user.id
+        admin_state.set_action(user_id, f"edit_project_address_{project_id}")
+        await query.edit_message_text("📍 Введите новый адрес проекта:")
+    
+    elif data.startswith("edit_project_images_"):
+        project_id = data.replace("edit_project_images_", "")
+        user_id = query.from_user.id
+        admin_state.set_action(user_id, f"edit_project_images_{project_id}")
+        admin_state.set_state(user_id, "new_project_images", [])
+        await query.edit_message_text("📷 Отправьте новые изображения проекта:")
 
 
 async def check_admin_callback(query) -> bool:

@@ -943,4 +943,17 @@ class MongoDBPersistenceTest(unittest.TestCase):
 if __name__ == '__main__':
     print(f"🚀 Testing API at: {API_URL}")
     print(f"🚀 Testing Telegram Bot Admin Panel")
+    
+    # Run MongoDB persistence tests
+    print("\n=== Running MongoDB Persistence Tests ===")
+    mongo_test = MongoDBPersistenceTest()
+    
+    # Run async tests
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(mongo_test.test_mongodb_connection())
+    loop.run_until_complete(mongo_test.test_product_crud())
+    loop.run_until_complete(mongo_test.test_project_crud())
+    loop.run_until_complete(mongo_test.test_data_persistence())
+    
+    # Run regular tests
     unittest.main(argv=['first-arg-is-ignored'], exit=False)

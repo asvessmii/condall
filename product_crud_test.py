@@ -145,12 +145,32 @@ class ProductCRUDTest(unittest.TestCase):
 
     def test_04_persistence_check(self):
         """Test data persistence after service restart"""
-        if not self.added_product_id:
-            self.skipTest("No added product ID available for persistence test")
+        # First add a test product for persistence testing
+        print("\n🔍 Adding a test product for persistence testing...")
         
-        print("\n🔍 Testing data persistence after service restart...")
+        persistence_test_product = {
+            "name": "Persistence Test AC",
+            "description": "This is a test product for persistence testing",
+            "short_description": "Persistence test",
+            "price": 40000,
+            "image_url": "https://example.com/persistence-test.jpg",
+            "specifications": {
+                "Мощность охлаждения": "4.0 кВт",
+                "Площадь помещения": "40 м²",
+                "Энергопотребление": "1.5 кВт",
+                "Уровень шума": "25 дБ",
+                "Класс энергоэффективности": "A++"
+            }
+        }
+        
+        response = requests.post(f"{API_URL}/products", json=persistence_test_product)
+        self.assertEqual(response.status_code, 200)
+        
+        persistence_product_id = response.json()["id"]
+        print(f"✅ Persistence test product added with ID: {persistence_product_id}")
         
         # Restart the backend service
+        print("\n🔍 Testing data persistence after service restart...")
         print("🔄 Restarting backend service...")
         os.system("sudo supervisorctl restart backend")
         
@@ -159,21 +179,20 @@ class ProductCRUDTest(unittest.TestCase):
         time.sleep(10)
         
         # Check if our added product still exists
-        print(f"🔍 Checking if added product (ID: {self.added_product_id}) still exists...")
-        response = requests.get(f"{API_URL}/products/{self.added_product_id}")
+        print(f"🔍 Checking if persistence test product (ID: {persistence_product_id}) still exists...")
+        response = requests.get(f"{API_URL}/products/{persistence_product_id}")
         
         self.assertEqual(response.status_code, 200)
         product = response.json()
-        self.assertEqual(product["id"], self.added_product_id)
+        self.assertEqual(product["id"], persistence_product_id)
+        self.assertEqual(product["name"], persistence_test_product["name"])
         
-        print("✅ Data persistence verified - added product still exists after service restart")
+        print("✅ Data persistence verified - test product still exists after service restart")
         
-        # Get all products to verify total count
-        response = requests.get(f"{API_URL}/products")
-        products = response.json()
-        
-        # Count should be consistent with what we had before
-        print(f"✅ Total product count after restart: {len(products)}")
+        # Clean up the persistence test product
+        print("🧹 Cleaning up persistence test product...")
+        self.db.products.delete_one({"id": persistence_product_id})
+        print("✅ Persistence test product deleted")
 
 if __name__ == '__main__':
     print(f"🚀 Testing Product CRUD operations at: {API_URL}")

@@ -992,44 +992,30 @@ async def start_project_edit(query, project_id: str):
 
 def main():
     """Start the bot"""
-    import asyncio
-    from telegram.error import Conflict
-    
-    async def run_bot():
-        try:
-            application = Application.builder().token(BOT_TOKEN).build()
-            
-            # Add handlers
-            application.add_handler(CommandHandler("start", start_command))
-            application.add_handler(CallbackQueryHandler(button_handler))
-            application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, message_handler))
-            application.add_handler(MessageHandler(filters.PHOTO, photo_handler))
-            
-            # Clear any existing webhooks and drop pending updates
-            try:
-                await application.bot.delete_webhook(drop_pending_updates=True)
-            except Exception as e:
-                logger.warning(f"Could not delete webhook: {e}")
-            
-            # Start polling with error handling
-            logger.info("Starting Telegram bot polling...")
-            await application.run_polling(
-                allowed_updates=Update.ALL_TYPES,
-                drop_pending_updates=True,
-                timeout=30
-            )
-            
-        except Conflict as e:
-            logger.error(f"Bot conflict error: {e}")
-            logger.info("Waiting 30 seconds before retrying...")
-            await asyncio.sleep(30)
-            await run_bot()  # Retry
-        except Exception as e:
-            logger.error(f"Bot error: {e}")
-            raise
-    
-    # Run the bot
-    asyncio.run(run_bot())
+    try:
+        application = Application.builder().token(BOT_TOKEN).build()
+        
+        # Add handlers
+        application.add_handler(CommandHandler("start", start_command))
+        application.add_handler(CallbackQueryHandler(button_handler))
+        application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, message_handler))
+        application.add_handler(MessageHandler(filters.PHOTO, photo_handler))
+        
+        logger.info("Starting Telegram bot...")
+        
+        # Start the bot with conflict handling
+        application.run_polling(
+            allowed_updates=Update.ALL_TYPES,
+            drop_pending_updates=True,
+            timeout=30
+        )
+        
+    except Exception as e:
+        logger.error(f"Bot error: {e}")
+        # Wait and retry
+        import time
+        time.sleep(30)
+        main()
 
 
 if __name__ == "__main__":

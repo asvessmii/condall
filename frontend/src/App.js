@@ -863,7 +863,7 @@ function App() {
     console.log('Telegram User:', user);
     
     fetchCartItems();
-    initializeData();
+    // initializeData(); // Убираем автоматическую инициализацию
   }, []);
 
   const initializeData = async () => {

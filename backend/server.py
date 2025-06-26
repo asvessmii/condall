@@ -550,6 +550,79 @@ async def manual_init_sample_data():
     
     return {"message": "Данные успешно инициализированы администратором", "products_count": len(products), "projects_count": len(projects)}
 
+# Backup management endpoints
+@api_router.post("/backup/create")
+async def create_database_backup():
+    """Создать резервную копию базы данных"""
+    if not DatabaseBackup:
+        raise HTTPException(status_code=500, detail="Модуль резервного копирования не доступен")
+    
+    backup = DatabaseBackup()
+    try:
+        success = await backup.create_backup()
+        if success:
+            return {"message": "Резервная копия создана успешно", "timestamp": datetime.utcnow().isoformat()}
+        else:
+            raise HTTPException(status_code=500, detail="Ошибка при создании резервной копии")
+    finally:
+        await backup.close()
+
+@api_router.post("/backup/restore")
+async def restore_database_backup():
+    """Восстановить данные из резервной копии"""
+    if not DatabaseBackup:
+        raise HTTPException(status_code=500, detail="Модуль резервного копирования не доступен")
+    
+    backup = DatabaseBackup()
+    try:
+        success = await backup.restore_backup()
+        if success:
+            products_count = await db.products.count_documents({})
+            projects_count = await db.projects.count_documents({})
+            return {
+                "message": "Данные восстановлены успешно", 
+                "products_count": products_count,
+                "projects_count": projects_count
+            }
+        else:
+            raise HTTPException(status_code=500, detail="Ошибка при восстановлении данных")
+    finally:
+        await backup.close()
+
+@api_router.get("/backup/status")
+async def get_backup_status():
+    """Получить информацию о состоянии базы данных и резервных копий"""
+    if not DatabaseBackup:
+        raise HTTPException(status_code=500, detail="Модуль резервного копирования не доступен")
+    
+    backup = DatabaseBackup()
+    try:
+        status = await backup.get_database_status()
+        
+        # Проверяем наличие файлов резервных копий
+        backup_dir = Path(__file__).parent / 'data'
+        backup_files = {}
+        for collection in ['products', 'projects', 'orders', 'feedback']:
+            backup_file = backup_dir / f"{collection}.json"
+            backup_files[collection] = backup_file.exists()
+        
+        # Информация о последней резервной копии
+        info_file = backup_dir / "backup_info.json"
+        last_backup = None
+        if info_file.exists():
+            with open(info_file, 'r', encoding='utf-8') as f:
+                backup_info = json.load(f)
+                last_backup = backup_info.get('timestamp')
+        
+        return {
+            "database_status": status,
+            "backup_files": backup_files,
+            "last_backup": last_backup,
+            "backup_available": any(backup_files.values())
+        }
+    finally:
+        await backup.close()
+
 # Include the router in the main app
 app.include_router(api_router)
 

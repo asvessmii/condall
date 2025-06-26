@@ -94,6 +94,7 @@ def get_main_menu_keyboard():
         [InlineKeyboardButton("🌐 Открыть сайт", web_app=WebAppInfo(url="https://b4ed057e-7f70-4c32-bc44-1592a6a375c9.preview.emergentagent.com"))],
         [InlineKeyboardButton("📦 Управление товарами", callback_data="manage_products")],
         [InlineKeyboardButton("🏗️ Управление проектами", callback_data="manage_projects")],
+        [InlineKeyboardButton("💾 Резервные копии", callback_data="backup_menu")],
         [InlineKeyboardButton("📊 Статистика", callback_data="statistics")]
     ]
     return InlineKeyboardMarkup(keyboard)

@@ -14,6 +14,12 @@ import asyncio
 import json
 from pathlib import Path
 
+# Импорт класса для работы с резервными копиями
+try:
+    from database_backup import DatabaseBackup
+except ImportError:
+    DatabaseBackup = None
+
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 

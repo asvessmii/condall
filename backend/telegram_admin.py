@@ -24,7 +24,7 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 logger = logging.getLogger(__name__)
 
 # Admin configuration
-ADMIN_ID = 7470811680
+ADMIN_ID = int(os.environ.get("ADMIN_ID", 0))
 BOT_TOKEN = os.environ.get('BOT_TOKEN')
 MONGO_URL = os.environ.get('MONGO_URL')
 DB_NAME = os.environ.get('DB_NAME')
@@ -564,11 +564,15 @@ async def photo_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         
         # Generate UUID for product
         import uuid
-        product_data["id"] = str(uuid.uuid4())
+        if "id" not in product_data:
+            product_data["id"] = str(uuid.uuid4())
         
         # Save to database
-        await db.products.insert_one(product_data)
-        
+        await db.products.update_one(
+            {"id": product_data["id"]},
+            {"$set": product_data},
+            upsert=True
+        )
         admin_state.clear_state(user_id)
         await update.message.reply_text(
             f"✅ Товар '{product_data['name']}' успешно добавлен!",
@@ -872,17 +876,17 @@ async def finish_project_creation(query, user_id: int):
     import uuid
     project_data["id"] = str(uuid.uuid4())
     project_data["created_at"] = datetime.utcnow()
-    
-    # Save to database
-    await db.projects.insert_one(project_data)
-    
+        # Save to database
+    await db.projects.update_one(
+        {"id": project_data["id"]},
+        {"$set": project_data},
+        upsert=True
+    )
     admin_state.clear_state(user_id)
     await query.edit_message_text(
-        f"✅ Проект '{project_data['title']}' успешно добавлен!",
+        f"✅ Проект \'{project_data['title']}\' успешно добавлен!",
         reply_markup=get_main_menu_keyboard()
     )
-
-
 async def finish_project_images_edit(query, user_id: int):
     """Finish editing project images"""
     editing_project = admin_state.get_state(user_id).get("editing_project", {})

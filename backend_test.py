@@ -10,6 +10,9 @@ from io import BytesIO
 from PIL import Image
 import importlib.util
 from datetime import datetime
+from motor.motor_asyncio import AsyncIOMotorClient
+import uuid
+import time
 
 # Get the backend URL from the frontend .env file
 with open('/app/frontend/.env', 'r') as f:
@@ -19,6 +22,10 @@ with open('/app/frontend/.env', 'r') as f:
             break
 
 API_URL = f"{BACKEND_URL}/api"
+
+# MongoDB connection
+MONGO_URL = "mongodb://localhost:27017"
+DB_NAME = "test_database"
 
 # Add backend directory to path to import telegram_admin
 sys.path.append('/app/backend')

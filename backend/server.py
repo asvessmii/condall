@@ -134,6 +134,13 @@ async def create_product(product_data: ProductCreate):
     await db.products.insert_one(product.dict())
     return product
 
+@api_router.delete("/products/{product_id}")
+async def delete_product(product_id: str):
+    result = await db.products.delete_one({"id": product_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Товар не найден")
+    return {"message": "Товар успешно удален"}
+
 # Cart endpoints
 @api_router.post("/cart", response_model=CartItem)
 async def add_to_cart(cart_item_data: CartItemCreate):

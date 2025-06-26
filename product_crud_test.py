@@ -118,9 +118,15 @@ class ProductCRUDTest(unittest.TestCase):
 
     def test_03_delete_product(self):
         """Test deleting a product"""
-        # Use a specific Haier product ID
-        haier_id = "a8713edc-5e90-4774-a423-7f326d8a86c8"
+        # Get a list of Haier products
+        response = requests.get(f"{API_URL}/products")
+        products = response.json()
+        haier_products = [p for p in products if "Haier" in p["name"]]
         
+        if not haier_products:
+            self.skipTest("No Haier products available for deletion test")
+        
+        haier_id = haier_products[0]["id"]
         print(f"\n🔍 Testing deleting a product (ID: {haier_id})...")
         
         # First, verify the product exists

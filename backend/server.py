@@ -238,16 +238,16 @@ async def create_project(project_data: Project):
     return project_data
 
 # Initialize sample data
-@api_router.post("/init-data")
+@api_router.post("/init-data") 
 async def init_sample_data():
     # Check if data already exists
     existing_products = await db.products.count_documents({})
     if existing_products > 0:
         return {"message": "Данные уже инициализированы", "products_count": existing_products}
     
-    # Clear existing data (just in case)
-    await db.products.delete_many({})
-    await db.projects.delete_many({})
+    # Check if this is a manual initialization (from admin)
+    # For now, we disable automatic initialization completely
+    return {"message": "Автоматическая инициализация отключена", "products_count": existing_products}
     
     # Sample products
     products = [

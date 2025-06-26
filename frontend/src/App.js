@@ -867,6 +867,9 @@ function App() {
   }, []);
 
   const initializeData = async () => {
+    // Функция отключена - данные инициализируются вручную
+    console.log('Автоматическая инициализация данных отключена');
+    return;
     try {
       await axios.post(`${API}/init-data`);
     } catch (error) {

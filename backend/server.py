@@ -388,8 +388,137 @@ async def manual_init_sample_data():
     await db.products.delete_many({})
     await db.projects.delete_many({})
     
-    # Sample products
-    products = []
+    # Sample products (copy from original init-data)
+    products = [
+        {
+            "name": "Mitsubishi Electric MSZ-AP35VG",
+            "short_description": "Инверторная сплит-система с Wi-Fi управлением",
+            "description": "Современная инверторная сплит-система с технологией 3D i-see Sensor для равномерного распределения воздуха. Энергоэффективный класс A+++, низкий уровень шума, режим обогрева до -25°C.",
+            "price": 45000,
+            "image_url": "https://images.pexels.com/photos/3964537/pexels-photo-3964537.jpeg",
+            "specifications": {
+                "Мощность охлаждения": "3.5 кВт",
+                "Площадь помещения": "35 м²",
+                "Энергопотребление": "1.2 кВт",
+                "Уровень шума": "19 дБ",
+                "Класс энергоэффективности": "A+++"
+            }
+        },
+        {
+            "name": "Daikin FTXM35R",
+            "short_description": "Премиальная модель с системой очистки воздуха",
+            "description": "Высокотехнологичная сплит-система с системой фильтрации Flash Streamer. Интеллектуальное управление, функция самоочистки, работа при низких температурах до -25°C.",
+            "price": 52000,
+            "image_url": "https://images.pexels.com/photos/3964341/pexels-photo-3964341.jpeg",
+            "specifications": {
+                "Мощность охлаждения": "3.5 кВт",
+                "Площадь помещения": "35 м²",
+                "Энергопотребление": "1.1 кВт",
+                "Уровень шума": "20 дБ",
+                "Класс энергоэффективности": "A+++"
+            }
+        },
+        {
+            "name": "LG Dual Cool AP09RT",
+            "short_description": "Двойная система охлаждения с экономичным потреблением",
+            "description": "Инновационная технология Dual Cool обеспечивает быстрое охлаждение и равномерное распределение воздуха. Инверторный компрессор, Wi-Fi модуль, режим энергосбережения.",
+            "price": 38000,
+            "image_url": "https://images.unsplash.com/photo-1709432767122-d3cb5326911a",
+            "specifications": {
+                "Мощность охлаждения": "2.6 кВт",
+                "Площадь помещения": "26 м²",
+                "Энергопотребление": "0.9 кВт",
+                "Уровень шума": "18 дБ",
+                "Класс энергоэффективности": "A+++"
+            }
+        },
+        {
+            "name": "Samsung AR12TXHZAWK",
+            "short_description": "Smart кондиционер с голосовым управлением",
+            "description": "Умный кондиционер с поддержкой голосовых команд и управления через смартфон. Технология WindFree для комфортного охлаждения без сквозняков, функция самодиагностики.",
+            "price": 41000,
+            "image_url": "https://images.pexels.com/photos/32588555/pexels-photo-32588555.jpeg",
+            "specifications": {
+                "Мощность охлаждения": "3.5 кВт",
+                "Площадь помещения": "35 м²",
+                "Энергопотребление": "1.15 кВт",
+                "Уровень шума": "17 дБ",
+                "Класс энергоэффективности": "A+++"
+            }
+        },
+        {
+            "name": "Panasonic CS-TZ25WKEW",
+            "short_description": "Компактная модель для небольших помещений",
+            "description": "Компактный и энергоэффективный кондиционер для небольших помещений. Быстрое охлаждение, тихая работа, режим осушения, экономичное энергопотребление.",
+            "price": 32000,
+            "image_url": "https://images.pexels.com/photos/7937300/pexels-photo-7937300.jpeg",
+            "specifications": {
+                "Мощность охлаждения": "2.5 кВт",
+                "Площадь помещения": "25 м²",
+                "Энергопотребление": "0.8 кВт", 
+                "Уровень шума": "21 дБ",
+                "Класс энергоэффективности": "A++"
+            }
+        },
+        {
+            "name": "Haier AS18NS4ERA",
+            "short_description": "Настенная сплит-система с самоочисткой",
+            "description": "Надежная сплит-система с функцией самоочистки и ионизации воздуха. Инверторный компрессор, режим 'Я дома/Меня нет', защита от перепадов напряжения.",
+            "price": 29000,
+            "image_url": "https://images.unsplash.com/photo-1727797208736-6efdc1088f81",
+            "specifications": {
+                "Мощность охлаждения": "5.0 кВт",
+                "Площадь помещения": "50 м²",
+                "Энергопотребление": "1.8 кВт",
+                "Уровень шума": "24 дБ",
+                "Класс энергоэффективности": "A++"
+            }
+        }
+    ]
+    
+    for product_data in products:
+        product = Product(**product_data)
+        await db.products.insert_one(product.dict())
+    
+    # Sample projects
+    projects = [
+        {
+            "title": "Монтаж системы кондиционирования в офисе",
+            "description": "Установка мульти-зональной системы кондиционирования в современном офисном здании площадью 500 м². Включает 12 внутренних блоков и 3 наружных блока с централизованным управлением.",
+            "address": "г. Москва, ул. Тверская, д. 15",
+            "images": [
+                "https://images.pexels.com/photos/32497161/pexels-photo-32497161.jpeg",
+                "https://images.pexels.com/photos/8297856/pexels-photo-8297856.jpeg",
+                "https://images.pexels.com/photos/31462219/pexels-photo-31462219.jpeg"
+            ]
+        },
+        {
+            "title": "Кондиционирование жилого дома",
+            "description": "Комплексная установка сплит-систем в трехэтажном частном доме. Установлено 6 внутренних блоков различной мощности с учетом планировки и особенностей каждого помещения.",
+            "address": "Московская область, г. Одинцово",
+            "images": [
+                "https://images.pexels.com/photos/16592625/pexels-photo-16592625.jpeg",
+                "https://images.pexels.com/photos/3964341/pexels-photo-3964341.jpeg",
+                "https://images.unsplash.com/photo-1729183672500-46c52a897de5"
+            ]
+        },
+        {
+            "title": "Промышленная система вентиляции",
+            "description": "Монтаж промышленной системы вентиляции и кондиционирования на производственном предприятии. Включает приточно-вытяжную установку мощностью 10 кВт и систему воздуховодов.",
+            "address": "г. Москва, Варшавское шоссе, д. 42",
+            "images": [
+                "https://images.pexels.com/photos/7937300/pexels-photo-7937300.jpeg",
+                "https://images.unsplash.com/photo-1616185501655-b134ec9405f9",
+                "https://images.pexels.com/photos/32588555/pexels-photo-32588555.jpeg"
+            ]
+        }
+    ]
+    
+    for project_data in projects:
+        project = Project(**project_data)
+        await db.projects.insert_one(project.dict())
+    
+    return {"message": "Данные успешно инициализированы администратором", "products_count": len(products), "projects_count": len(projects)}
 
 # Include the router in the main app
 app.include_router(api_router)

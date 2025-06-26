@@ -327,8 +327,19 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def check_admin_callback(query) -> bool:
     """Check if user is admin for callback"""
     user_id = query.from_user.id
+    username = query.from_user.username or "Unknown"
+    first_name = query.from_user.first_name or "Unknown"
+    
+    # Log user info for debugging
+    logger.info(f"User trying to access via callback: ID={user_id}, Username=@{username}, Name={first_name}")
+    
     if user_id != ADMIN_ID:
-        await query.answer("❌ У вас нет прав доступа к админ панели", show_alert=True)
+        await query.answer(
+            f"❌ У вас нет прав доступа к админ панели\n"
+            f"🆔 Ваш ID: {user_id}\n"
+            f"👤 Имя: {first_name}", 
+            show_alert=True
+        )
         return False
     return True
 

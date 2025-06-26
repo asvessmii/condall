@@ -224,6 +224,26 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     elif data == "statistics":
         await show_statistics(query)
+    
+    elif data == "finish_project":
+        user_id = query.from_user.id
+        await finish_project_creation(query, user_id)
+    
+    elif data == "continue_images":
+        await query.edit_message_text(
+            "📷 Отправьте еще одно изображение проекта:",
+            parse_mode=ParseMode.MARKDOWN
+        )
+    
+    elif data == "finish_project_images":
+        user_id = query.from_user.id
+        await finish_project_images_edit(query, user_id)
+    
+    elif data == "continue_project_images":
+        await query.edit_message_text(
+            "📷 Отправьте еще одно изображение проекта:",
+            parse_mode=ParseMode.MARKDOWN
+        )
 
 
 async def check_admin_callback(query) -> bool:

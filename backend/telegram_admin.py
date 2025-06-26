@@ -992,16 +992,52 @@ async def start_project_edit(query, project_id: str):
 
 def main():
     """Start the bot"""
-    application = Application.builder().token(BOT_TOKEN).build()
+    import asyncio
+    from telegram.error import Conflict
     
-    # Add handlers
-    application.add_handler(CommandHandler("start", start_command))
-    application.add_handler(CallbackQueryHandler(button_handler))
-    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, message_handler))
-    application.add_handler(MessageHandler(filters.PHOTO, photo_handler))
+    async def run_bot():
+        try:
+            application = Application.builder().token(BOT_TOKEN).build()
+            
+            # Add handlers
+            application.add_handler(CommandHandler("start", start_command))
+            application.add_handler(CallbackQueryHandler(button_handler))
+            application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, message_handler))
+            application.add_handler(MessageHandler(filters.PHOTO, photo_handler))
+            
+            # Initialize and start the bot
+            await application.initialize()
+            await application.start()
+            
+            # Clear any existing getUpdates requests
+            try:
+                await application.bot.delete_webhook(drop_pending_updates=True)
+            except Exception as e:
+                logger.warning(f"Could not delete webhook: {e}")
+            
+            # Start polling with error handling
+            logger.info("Starting Telegram bot polling...")
+            await application.updater.start_polling(
+                allowed_updates=Update.ALL_TYPES,
+                drop_pending_updates=True,
+                timeout=30,
+                bootstrap_retries=5
+            )
+            
+            # Keep the bot running
+            await application.updater.idle()
+            
+        except Conflict as e:
+            logger.error(f"Bot conflict error: {e}")
+            logger.info("Waiting 30 seconds before retrying...")
+            await asyncio.sleep(30)
+            await run_bot()  # Retry
+        except Exception as e:
+            logger.error(f"Bot error: {e}")
+            raise
     
-    # Start the bot
-    application.run_polling(allowed_updates=Update.ALL_TYPES)
+    # Run the bot
+    asyncio.run(run_bot())
 
 
 if __name__ == "__main__":

@@ -381,6 +381,16 @@ async def init_sample_data():
     
     return {"message": "Тестовые данные успешно загружены"}
 
+# Manual data initialization for admin
+@api_router.post("/admin/init-data")
+async def manual_init_sample_data():
+    # Clear existing data
+    await db.products.delete_many({})
+    await db.projects.delete_many({})
+    
+    # Sample products
+    products = []
+
 # Include the router in the main app
 app.include_router(api_router)
 

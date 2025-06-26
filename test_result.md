@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Реализация админ панели через бота телеграм, права на которые есть только у id:7470811680. В этой админке через бота у меня должно быть следующее: возможность редактирования вкладок 'Каталог' и 'О нас'. А именно, возможность добавления и удаления товара, изменения описания, изменения 'Подробнее' у каждого, изменение ценника, изменения изображения. Во вкладке О нас возможность редактирования, добавления, удаления каждого из проектов. в каждом возможность редактировать адрес, описание, название, изображения. ПРОБЛЕМА: после перезахода в приложение изменения введенные через админку исчезают, то есть они не сохраняются в БД."
+user_problem_statement: "Мне нужно протестировать функциональность добавления и удаления товаров в системе интернет-магазина кондиционеров."
 
 backend:
   - task: "Fix Database Persistence Issue"
@@ -195,6 +195,21 @@ backend:
         agent: "testing"
         comment: "Verified all required dependencies are installed: python-telegram-bot for bot functionality, Pillow for image processing, and motor for MongoDB operations. All dependencies are correctly specified in requirements.txt."
 
+  - task: "Product CRUD Operations via API"
+    implemented: true
+    working: true
+    file: "server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "user"
+        comment: "User requested testing of product CRUD operations via API"
+      - working: true
+        agent: "testing"
+        comment: "Tested product CRUD operations via API. GET /api/products works correctly, showing all products. POST /api/products successfully adds new products. Data persistence works correctly - products remain after backend restart. Note: DELETE endpoint for products is missing in the API, which limits the ability to delete products via API. For testing purposes, direct MongoDB deletion was used and verified to work."
+
 frontend:
   - task: "Frontend Integration (No changes needed)"
     implemented: true
@@ -211,14 +226,12 @@ frontend:
 metadata:
   created_by: "main_agent"
   version: "2.0"
-  test_sequence: 2
+  test_sequence: 3
   run_ui: false
 
 test_plan:
   current_focus:
-    - "Telegram Bot Admin Panel Implementation"
-    - "Products CRUD Operations via Telegram Bot"
-    - "Projects CRUD Operations via Telegram Bot"
+    - "Product CRUD Operations via API"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
@@ -238,3 +251,7 @@ agent_communication:
     message: "ПРОБЛЕМА ПОЛНОСТЬЮ РЕШЕНА! Выполнено исправление проблемы с персистентностью данных: 1) Добавил Telegram бот как постоянный сервис в supervisor (/etc/supervisor/conf.d/supervisord.conf), 2) Обновил конфигурацию для автоматического запуска и перезапуска бота, 3) Исправил конфликты в коде бота для стабильной работы. Тестирование подтвердило: все CRUD операции работают корректно, данные сохраняются в MongoDB и не исчезают после перезапуска сервисов."
   - agent: "testing"
     message: "Проведено полное тестирование исправлений персистентности данных. Все тесты прошли успешно! Подтверждено: 1) MongoDB подключение стабильно, 2) Все CRUD операции для товаров/проектов работают корректно, 3) Данные сохраняются после перезапуска backend сервиса, 4) Telegram бот настроен как supervisor сервис, 5) Все API endpoints функционируют правильно. Основная проблема с персистентностью данных полностью решена."
+  - agent: "user"
+    message: "Мне нужно протестировать функциональность добавления и удаления товаров в системе интернет-магазина кондиционеров."
+  - agent: "testing"
+    message: "Выполнено тестирование CRUD операций с товарами через API. Результаты: 1) GET /api/products работает корректно, показывая все товары в базе данных, 2) POST /api/products успешно добавляет новые товары, 3) Данные сохраняются после перезапуска backend сервиса, что подтверждает корректную работу персистентности. Обнаружено ограничение: в API отсутствует DELETE endpoint для удаления товаров. Для полноценной работы с товарами через API рекомендуется добавить endpoint DELETE /api/products/{product_id} в server.py. Все тесты проведены с использованием скрипта product_crud_test.py."

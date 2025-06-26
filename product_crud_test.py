@@ -103,13 +103,10 @@ class ProductCRUDTest(unittest.TestCase):
         response = requests.get(f"{API_URL}/products/{self.haier_product_id_to_delete}")
         self.assertEqual(response.status_code, 200)
         
-        # Delete the product
         # Note: The API doesn't have a direct delete endpoint for products in server.py
-        # We'll need to use a different approach or note this as a limitation
-        
-        print("⚠️ The API doesn't have a direct delete endpoint for products")
-        print("⚠️ This would require adding a DELETE endpoint to server.py")
-        print("⚠️ Skipping actual deletion test")
+        print("⚠️ The API doesn't have a DELETE endpoint for products")
+        print("⚠️ This is a limitation in the current API implementation")
+        print("⚠️ To implement product deletion, a DELETE endpoint needs to be added to server.py")
         
         # For demonstration, we'll check that the product still exists
         response = requests.get(f"{API_URL}/products/{self.haier_product_id_to_delete}")

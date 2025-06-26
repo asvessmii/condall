@@ -118,13 +118,13 @@ class ProductCRUDTest(unittest.TestCase):
 
     def test_03_delete_product(self):
         """Test deleting a product"""
-        if not self.haier_product_id_to_delete:
-            self.skipTest("No Haier product ID available for deletion test")
+        # Use a specific Haier product ID
+        haier_id = "a8713edc-5e90-4774-a423-7f326d8a86c8"
         
-        print(f"\n🔍 Testing deleting a product (ID: {self.haier_product_id_to_delete})...")
+        print(f"\n🔍 Testing deleting a product (ID: {haier_id})...")
         
         # First, verify the product exists
-        response = requests.get(f"{API_URL}/products/{self.haier_product_id_to_delete}")
+        response = requests.get(f"{API_URL}/products/{haier_id}")
         self.assertEqual(response.status_code, 200)
         
         # Note: The API doesn't have a direct delete endpoint for products in server.py
@@ -134,12 +134,12 @@ class ProductCRUDTest(unittest.TestCase):
         
         # For testing purposes, we'll delete directly from MongoDB
         print("🔍 Deleting product directly from MongoDB for testing purposes...")
-        result = self.db.products.delete_one({"id": self.haier_product_id_to_delete})
+        result = self.db.products.delete_one({"id": haier_id})
         self.assertEqual(result.deleted_count, 1)
         print(f"✅ Product deleted from MongoDB: {result.deleted_count} document removed")
         
         # Verify the product no longer exists via API
-        response = requests.get(f"{API_URL}/products/{self.haier_product_id_to_delete}")
+        response = requests.get(f"{API_URL}/products/{haier_id}")
         self.assertEqual(response.status_code, 404)
         print("✅ Product no longer accessible via API (404 Not Found)")
 

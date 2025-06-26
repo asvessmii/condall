@@ -568,11 +568,7 @@ async def photo_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             product_data["id"] = str(uuid.uuid4())
         
         # Save to database
-        await db.products.update_one(
-            {"id": product_data["id"]},
-            {"$set": product_data},
-            upsert=True
-        )
+        await db.products.insert_one(product_data)
         admin_state.clear_state(user_id)
         await update.message.reply_text(
             f"✅ Товар '{product_data['name']}' успешно добавлен!",

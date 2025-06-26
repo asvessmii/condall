@@ -105,6 +105,24 @@
 user_problem_statement: "Реализация админ панели через бота телеграм, права на которые есть только у id:7470811680. В этой админке через бота у меня должно быть следующее: возможность редактирования вкладок 'Каталог' и 'О нас'. А именно, возможность добавления и удаления товара, изменения описания, изменения 'Подробнее' у каждого, изменение ценника, изменения изображения. Во вкладке О нас возможность редактирования, добавления, удаления каждого из проектов. в каждом возможность редактировать адрес, описание, название, изображения. ПРОБЛЕМА: после перезахода в приложение изменения введенные через админку исчезают, то есть они не сохраняются в БД."
 
 backend:
+  - task: "Fix Database Persistence Issue"
+    implemented: true
+    working: true
+    file: "supervisor configuration, telegram_admin.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: false
+        agent: "user"
+        comment: "User reported that changes made through Telegram admin panel disappear after re-entering the application - data not being saved to database"
+      - working: "NA"
+        agent: "main"
+        comment: "Identified root cause: Telegram bot was not running as a service. Added telegram_bot to supervisor configuration to run continuously. Also added missing event handlers for product/project editing (edit_product_name_, edit_project_title_, etc.) and fixed callback handling for finish_project, continue_images actions."
+      - working: true
+        agent: "testing"
+        comment: "Fixed persistence issue completely! Testing confirmed: 1) Telegram bot now runs as supervisor service, 2) All CRUD operations work correctly, 3) Data persists after service restart, 4) All missing event handlers added and working, 5) MongoDB connection stable, 6) API endpoints functioning properly. The core issue has been resolved - data now saves properly to database."
+
   - task: "Telegram Bot Admin Panel Implementation"
     implemented: true
     working: true
@@ -119,6 +137,9 @@ backend:
       - working: true
         agent: "testing"
         comment: "Tested bot initialization, admin authentication, and main menu navigation. Bot starts without errors, correctly authenticates admin ID 7470811680, and blocks unauthorized users. Main menu and navigation between product and project management works correctly."
+      - working: true
+        agent: "main"
+        comment: "Enhanced with missing event handlers for all editing operations. Now supports complete product editing (name, descriptions, price, specs, image) and project editing (title, description, address, images)."
 
   - task: "Products CRUD Operations via Telegram Bot"
     implemented: true

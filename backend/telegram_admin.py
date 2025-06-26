@@ -15,6 +15,12 @@ from telegram.constants import ParseMode
 from motor.motor_asyncio import AsyncIOMotorClient
 from pydantic import BaseModel
 
+# Импорт модуля резервного копирования
+try:
+    from database_backup import DatabaseBackup
+except ImportError:
+    DatabaseBackup = None
+
 # Load environment variables
 load_dotenv()
 

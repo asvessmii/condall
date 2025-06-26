@@ -1005,11 +1005,7 @@ def main():
             application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, message_handler))
             application.add_handler(MessageHandler(filters.PHOTO, photo_handler))
             
-            # Initialize and start the bot
-            await application.initialize()
-            await application.start()
-            
-            # Clear any existing getUpdates requests
+            # Clear any existing webhooks and drop pending updates
             try:
                 await application.bot.delete_webhook(drop_pending_updates=True)
             except Exception as e:
@@ -1017,15 +1013,11 @@ def main():
             
             # Start polling with error handling
             logger.info("Starting Telegram bot polling...")
-            await application.updater.start_polling(
+            await application.run_polling(
                 allowed_updates=Update.ALL_TYPES,
                 drop_pending_updates=True,
-                timeout=30,
-                bootstrap_retries=5
+                timeout=30
             )
-            
-            # Keep the bot running
-            await application.updater.idle()
             
         except Conflict as e:
             logger.error(f"Bot conflict error: {e}")

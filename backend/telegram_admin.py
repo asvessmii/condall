@@ -873,11 +873,7 @@ async def finish_project_creation(query, user_id: int):
     project_data["id"] = str(uuid.uuid4())
     project_data["created_at"] = datetime.utcnow()
         # Save to database
-    await db.projects.update_one(
-        {"id": project_data["id"]},
-        {"$set": project_data},
-        upsert=True
-    )
+    await db.projects.insert_one(project_data)
     admin_state.clear_state(user_id)
     await query.edit_message_text(
         f"✅ Проект \'{project_data['title']}\' успешно добавлен!",

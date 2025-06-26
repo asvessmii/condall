@@ -240,7 +240,12 @@ async def create_project(project_data: Project):
 # Initialize sample data
 @api_router.post("/init-data")
 async def init_sample_data():
-    # Clear existing data
+    # Check if data already exists
+    existing_products = await db.products.count_documents({})
+    if existing_products > 0:
+        return {"message": "Данные уже инициализированы", "products_count": existing_products}
+    
+    # Clear existing data (just in case)
     await db.products.delete_many({})
     await db.projects.delete_many({})
     

@@ -408,6 +408,114 @@ async def message_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         admin_state.set_state(user_id, "new_project", project_data)
         admin_state.set_action(user_id, "add_project_images")
         await update.message.reply_text("📷 Отправьте изображения проекта (можно несколько):")
+    
+    # Handle product editing
+    elif action.startswith("edit_product_name_"):
+        product_id = action.replace("edit_product_name_", "")
+        await db.products.update_one(
+            {"id": product_id}, 
+            {"$set": {"name": text}}
+        )
+        admin_state.clear_state(user_id)
+        await update.message.reply_text(
+            "✅ Название товара обновлено!",
+            reply_markup=get_main_menu_keyboard()
+        )
+    
+    elif action.startswith("edit_product_short_desc_"):
+        product_id = action.replace("edit_product_short_desc_", "")
+        await db.products.update_one(
+            {"id": product_id}, 
+            {"$set": {"short_description": text}}
+        )
+        admin_state.clear_state(user_id)
+        await update.message.reply_text(
+            "✅ Краткое описание товара обновлено!",
+            reply_markup=get_main_menu_keyboard()
+        )
+    
+    elif action.startswith("edit_product_desc_"):
+        product_id = action.replace("edit_product_desc_", "")
+        await db.products.update_one(
+            {"id": product_id}, 
+            {"$set": {"description": text}}
+        )
+        admin_state.clear_state(user_id)
+        await update.message.reply_text(
+            "✅ Описание товара обновлено!",
+            reply_markup=get_main_menu_keyboard()
+        )
+    
+    elif action.startswith("edit_product_price_"):
+        try:
+            price = float(text)
+            product_id = action.replace("edit_product_price_", "")
+            await db.products.update_one(
+                {"id": product_id}, 
+                {"$set": {"price": price}}
+            )
+            admin_state.clear_state(user_id)
+            await update.message.reply_text(
+                "✅ Цена товара обновлена!",
+                reply_markup=get_main_menu_keyboard()
+            )
+        except ValueError:
+            await update.message.reply_text("❌ Пожалуйста, введите корректную цену (только число)")
+    
+    elif action.startswith("edit_product_specs_"):
+        specifications = {}
+        for line in text.split('\n'):
+            if ':' in line:
+                key, value = line.split(':', 1)
+                specifications[key.strip()] = value.strip()
+        
+        product_id = action.replace("edit_product_specs_", "")
+        await db.products.update_one(
+            {"id": product_id}, 
+            {"$set": {"specifications": specifications}}
+        )
+        admin_state.clear_state(user_id)
+        await update.message.reply_text(
+            "✅ Характеристики товара обновлены!",
+            reply_markup=get_main_menu_keyboard()
+        )
+    
+    # Handle project editing
+    elif action.startswith("edit_project_title_"):
+        project_id = action.replace("edit_project_title_", "")
+        await db.projects.update_one(
+            {"id": project_id}, 
+            {"$set": {"title": text}}
+        )
+        admin_state.clear_state(user_id)
+        await update.message.reply_text(
+            "✅ Название проекта обновлено!",
+            reply_markup=get_main_menu_keyboard()
+        )
+    
+    elif action.startswith("edit_project_desc_"):
+        project_id = action.replace("edit_project_desc_", "")
+        await db.projects.update_one(
+            {"id": project_id}, 
+            {"$set": {"description": text}}
+        )
+        admin_state.clear_state(user_id)
+        await update.message.reply_text(
+            "✅ Описание проекта обновлено!",
+            reply_markup=get_main_menu_keyboard()
+        )
+    
+    elif action.startswith("edit_project_address_"):
+        project_id = action.replace("edit_project_address_", "")
+        await db.projects.update_one(
+            {"id": project_id}, 
+            {"$set": {"address": text}}
+        )
+        admin_state.clear_state(user_id)
+        await update.message.reply_text(
+            "✅ Адрес проекта обновлен!",
+            reply_markup=get_main_menu_keyboard()
+        )
 
 
 async def photo_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):

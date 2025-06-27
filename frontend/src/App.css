@@ -74,12 +74,19 @@ body {
 }
 
 .header-title {
-  font-size: var(--font-size-lg);
-  font-weight: 600;
+  font-family: 'Montserrat', sans-serif;
+  font-size: var(--font-size-xl);
+  font-weight: 800;
   color: var(--tg-theme-text-color);
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
+  background: linear-gradient(135deg, #64b5f6, #42a5f5, #2196f3);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: 0 2px 8px rgba(33, 150, 243, 0.3);
+  letter-spacing: 0.5px;
 }
 
 .header-icon {

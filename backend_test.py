@@ -324,84 +324,100 @@ class TelegramUserInfoTest(unittest.TestCase):
 
     def setUp(self):
         """Initialize test data"""
-        self.client = AsyncIOMotorClient(MONGO_URL)
-        self.db = self.client[DB_NAME]
+        # We can't use setUp for async initialization
+        pass
         
     def tearDown(self):
         """Clean up after tests"""
-        self.client.close()
+        pass
 
     async def test_01_feedback_schema(self):
         """Test feedback schema with Telegram user info"""
         print("\n🔍 Testing feedback schema with Telegram user info...")
         
-        # Create test feedback with Telegram data
-        feedback_id = str(uuid.uuid4())
-        test_feedback = {
-            "id": feedback_id,
-            "name": "Schema Test User",
-            "phone": "+7 (999) 888-77-66",
-            "message": "Testing feedback schema with Telegram data",
-            "tg_user_id": "123456789",
-            "tg_username": "schema_test_user",
-            "created_at": datetime.utcnow()
-        }
+        # Initialize MongoDB client
+        client = AsyncIOMotorClient(MONGO_URL)
+        db = client[DB_NAME]
         
-        # Insert test feedback
-        await self.db.feedback.insert_one(test_feedback)
-        print("✅ Test feedback created")
-        
-        # Retrieve and verify
-        feedback = await self.db.feedback.find_one({"id": feedback_id})
-        self.assertIsNotNone(feedback)
-        self.assertEqual(feedback["tg_user_id"], "123456789")
-        self.assertEqual(feedback["tg_username"], "schema_test_user")
-        print("✅ Feedback schema includes Telegram user info fields")
-        
-        # Clean up
-        await self.db.feedback.delete_one({"id": feedback_id})
-        print("✅ Test feedback deleted")
+        try:
+            # Create test feedback with Telegram data
+            feedback_id = str(uuid.uuid4())
+            test_feedback = {
+                "id": feedback_id,
+                "name": "Schema Test User",
+                "phone": "+7 (999) 888-77-66",
+                "message": "Testing feedback schema with Telegram data",
+                "tg_user_id": "123456789",
+                "tg_username": "schema_test_user",
+                "created_at": datetime.utcnow()
+            }
+            
+            # Insert test feedback
+            await db.feedback.insert_one(test_feedback)
+            print("✅ Test feedback created")
+            
+            # Retrieve and verify
+            feedback = await db.feedback.find_one({"id": feedback_id})
+            self.assertIsNotNone(feedback)
+            self.assertEqual(feedback["tg_user_id"], "123456789")
+            self.assertEqual(feedback["tg_username"], "schema_test_user")
+            print("✅ Feedback schema includes Telegram user info fields")
+            
+            # Clean up
+            await db.feedback.delete_one({"id": feedback_id})
+            print("✅ Test feedback deleted")
+        finally:
+            # Close connection
+            client.close()
         
     async def test_02_order_schema(self):
         """Test order schema with Telegram user info"""
         print("\n🔍 Testing order schema with Telegram user info...")
         
-        # Create test order with Telegram data
-        order_id = str(uuid.uuid4())
-        test_order = {
-            "id": order_id,
-            "items": [
-                {
-                    "id": str(uuid.uuid4()),
-                    "user_id": "test_user_id",
-                    "product_id": str(uuid.uuid4()),
-                    "product_name": "Test Product",
-                    "price": 1000.0,
-                    "quantity": 1,
-                    "created_at": datetime.utcnow()
-                }
-            ],
-            "total_amount": 1000.0,
-            "tg_user_id": "987654321",
-            "tg_username": "order_schema_test",
-            "created_at": datetime.utcnow(),
-            "status": "pending"
-        }
+        # Initialize MongoDB client
+        client = AsyncIOMotorClient(MONGO_URL)
+        db = client[DB_NAME]
         
-        # Insert test order
-        await self.db.orders.insert_one(test_order)
-        print("✅ Test order created")
-        
-        # Retrieve and verify
-        order = await self.db.orders.find_one({"id": order_id})
-        self.assertIsNotNone(order)
-        self.assertEqual(order["tg_user_id"], "987654321")
-        self.assertEqual(order["tg_username"], "order_schema_test")
-        print("✅ Order schema includes Telegram user info fields")
-        
-        # Clean up
-        await self.db.orders.delete_one({"id": order_id})
-        print("✅ Test order deleted")
+        try:
+            # Create test order with Telegram data
+            order_id = str(uuid.uuid4())
+            test_order = {
+                "id": order_id,
+                "items": [
+                    {
+                        "id": str(uuid.uuid4()),
+                        "user_id": "test_user_id",
+                        "product_id": str(uuid.uuid4()),
+                        "product_name": "Test Product",
+                        "price": 1000.0,
+                        "quantity": 1,
+                        "created_at": datetime.utcnow()
+                    }
+                ],
+                "total_amount": 1000.0,
+                "tg_user_id": "987654321",
+                "tg_username": "order_schema_test",
+                "created_at": datetime.utcnow(),
+                "status": "pending"
+            }
+            
+            # Insert test order
+            await db.orders.insert_one(test_order)
+            print("✅ Test order created")
+            
+            # Retrieve and verify
+            order = await db.orders.find_one({"id": order_id})
+            self.assertIsNotNone(order)
+            self.assertEqual(order["tg_user_id"], "987654321")
+            self.assertEqual(order["tg_username"], "order_schema_test")
+            print("✅ Order schema includes Telegram user info fields")
+            
+            # Clean up
+            await db.orders.delete_one({"id": order_id})
+            print("✅ Test order deleted")
+        finally:
+            # Close connection
+            client.close()
         
     async def test_03_feedback_api_validation(self):
         """Test feedback API validation with Telegram user info"""

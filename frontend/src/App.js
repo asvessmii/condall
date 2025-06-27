@@ -1127,6 +1127,16 @@ function App() {
   return (
     <div className="app">
       <Header />
+      {showPromoPopup && (
+        <div className={`promo-popup ${popupAnimationClass}`}>
+          <div className="promo-popup-content">
+            <div className="promo-popup-icon">🎁</div>
+            <div className="promo-popup-text">
+              <strong>Кондиционер Haier + монтаж = 40.990₽*</strong>
+            </div>
+          </div>
+        </div>
+      )}
       <main className="main-content">
         {renderSection()}
       </main>

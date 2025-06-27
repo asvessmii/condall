@@ -403,4 +403,34 @@ class CartFunctionalityTest(unittest.TestCase):
 
 if __name__ == '__main__':
     print(f"🚀 Testing Cart API at: {API_URL}")
-    unittest.main(argv=['first-arg-is-ignored'], exit=False)
+    
+    # Create a test suite with individual tests
+    suite = unittest.TestSuite()
+    
+    # Add tests one by one
+    test_cases = [
+        CartFunctionalityTest('test_01_get_products'),
+        CartFunctionalityTest('test_02_empty_cart'),
+        CartFunctionalityTest('test_03_add_to_cart'),
+        CartFunctionalityTest('test_04_get_cart_with_items'),
+        CartFunctionalityTest('test_05_add_same_product_twice'),
+        CartFunctionalityTest('test_06_add_multiple_products'),
+        CartFunctionalityTest('test_07_remove_from_cart'),
+        CartFunctionalityTest('test_08_clear_cart'),
+        CartFunctionalityTest('test_09_add_nonexistent_product'),
+        CartFunctionalityTest('test_10_cart_without_user_id'),
+        CartFunctionalityTest('test_11_cart_isolation'),
+        CartFunctionalityTest('test_12_zero_quantity')
+    ]
+    
+    # Run tests one by one with detailed output
+    for test_case in test_cases:
+        print(f"\n{'='*80}")
+        print(f"RUNNING TEST: {test_case._testMethodName}")
+        print(f"{'='*80}")
+        result = unittest.TextTestRunner(verbosity=2).run(test_case)
+        if not result.wasSuccessful():
+            print(f"❌ Test {test_case._testMethodName} FAILED!")
+            break
+        else:
+            print(f"✅ Test {test_case._testMethodName} PASSED!")

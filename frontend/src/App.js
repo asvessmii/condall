@@ -968,8 +968,7 @@ function App() {
 
   const handleClearCart = async () => {
     try {
-      // Get user_id from telegram or use fallback
-      const userId = telegramUser?.id || 'guest_user';
+      const userId = getUserId();
       await axios.delete(`${API}/cart?user_id=${userId}`);
       setCartItems([]);
     } catch (error) {

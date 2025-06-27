@@ -1187,6 +1187,11 @@ function App() {
     }
   };
 
+  const handlePromoNavigate = () => {
+    setShouldAutoFillPromo(true);
+    setActiveSection('feedback');
+  };
+
   const renderSection = () => {
     switch (activeSection) {
       case 'catalog':
@@ -1194,9 +1199,20 @@ function App() {
       case 'about':
         return <About />;
       case 'promotions':
-        return <Promotions />;
+        return (
+          <Promotions 
+            promotionView={promotionView}
+            setPromotionView={setPromotionView}
+            onPromoNavigate={handlePromoNavigate}
+          />
+        );
       case 'feedback':
-        return <Feedback />;
+        return (
+          <Feedback 
+            shouldAutoFillPromo={shouldAutoFillPromo}
+            setShouldAutoFillPromo={setShouldAutoFillPromo}
+          />
+        );
       case 'cart':
         return (
           <Cart 

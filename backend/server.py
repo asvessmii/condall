@@ -154,12 +154,33 @@ async def delete_product(product_id: str):
 # Cart endpoints
 @api_router.post("/cart", response_model=CartItem)
 async def add_to_cart(cart_item_data: CartItemCreate):
+    # Validate user_id
+    if not cart_item_data.user_id:
+        raise HTTPException(status_code=400, detail="user_id обязателен для добавления в корзину")
+    
+    # Check if item already exists in user's cart
+    existing_item = await db.cart_items.find_one({
+        "user_id": cart_item_data.user_id,
+        "product_id": cart_item_data.product_id
+    })
+    
+    if existing_item:
+        # Update quantity instead of creating duplicate
+        new_quantity = existing_item["quantity"] + cart_item_data.quantity
+        await db.cart_items.update_one(
+            {"user_id": cart_item_data.user_id, "product_id": cart_item_data.product_id},
+            {"$set": {"quantity": new_quantity}}
+        )
+        existing_item["quantity"] = new_quantity
+        return CartItem(**existing_item)
+    
     # Get product details
     product = await db.products.find_one({"id": cart_item_data.product_id})
     if not product:
         raise HTTPException(status_code=404, detail="Товар не найден")
     
     cart_item = CartItem(
+        user_id=cart_item_data.user_id,
         product_id=cart_item_data.product_id,
         product_name=product["name"],
         price=product["price"],
@@ -169,21 +190,30 @@ async def add_to_cart(cart_item_data: CartItemCreate):
     return cart_item
 
 @api_router.get("/cart", response_model=List[CartItem])
-async def get_cart():
-    cart_items = await db.cart_items.find().to_list(1000)
+async def get_cart(user_id: str):
+    if not user_id:
+        raise HTTPException(status_code=400, detail="user_id обязателен для получения корзины")
+    
+    cart_items = await db.cart_items.find({"user_id": user_id}).to_list(1000)
     return [CartItem(**item) for item in cart_items]
 
 @api_router.delete("/cart/{item_id}")
-async def remove_from_cart(item_id: str):
-    result = await db.cart_items.delete_one({"id": item_id})
+async def remove_from_cart(item_id: str, user_id: str):
+    if not user_id:
+        raise HTTPException(status_code=400, detail="user_id обязателен для удаления из корзины")
+    
+    result = await db.cart_items.delete_one({"id": item_id, "user_id": user_id})
     if result.deleted_count == 0:
-        raise HTTPException(status_code=404, detail="Товар в корзине не найден")
+        raise HTTPException(status_code=404, detail="Товар в корзине не найден или не принадлежит пользователю")
     return {"message": "Товар удален из корзины"}
 
 @api_router.delete("/cart")
-async def clear_cart():
-    await db.cart_items.delete_many({})
-    return {"message": "Корзина очищена"}
+async def clear_cart(user_id: str):
+    if not user_id:
+        raise HTTPException(status_code=400, detail="user_id обязателен для очистки корзины")
+    
+    result = await db.cart_items.delete_many({"user_id": user_id})
+    return {"message": f"Корзина очищена. Удалено товаров: {result.deleted_count}"}
 
 # Feedback endpoints
 @api_router.post("/feedback")

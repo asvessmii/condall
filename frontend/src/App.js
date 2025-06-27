@@ -612,19 +612,89 @@ const About = () => {
 };
 
 // Promotions Section
-const Promotions = () => {
+const Promotions = ({ promotionView, setPromotionView, onPromoNavigate }) => {
+  if (promotionView === 'details') {
+    return (
+      <div className="section">
+        <div className="section-content">
+          <div className="promotion-details">
+            <div className="promotion-details-header">
+              <button 
+                onClick={() => setPromotionView('list')}
+                className="back-btn"
+              >
+                ← Назад к акциям
+              </button>
+              <h2 className="promotion-details-title">🎁 АКЦИЯ! Кондиционер HISENSE + монтаж — всего 40 990 ₽</h2>
+            </div>
+            
+            <div className="promotion-details-content">
+              <div className="promotion-description">
+                <p className="promotion-intro">
+                  Заполните форму во вкладке "Связь" и укажите в комментарии кодовое слово: <strong>АКЦИЯ</strong>, чтобы получить установку кондиционера Hisense AS-07HR4RYDDJ00 по специальной цене.
+                </p>
+                
+                <div className="promotion-features">
+                  <h3 className="promotion-features-title">🛠️ В стоимость входит БАЗОВЫЙ МОНТАЖ в пределах г. Санкт-Петербург.</h3>
+                  
+                  <div className="promotion-features-details">
+                    <h4 className="features-subtitle">📌 Что входит в БАЗОВЫЙ МОНТАЖ:</h4>
+                    <ul className="features-list">
+                      <li>Установка внешнего блока на фасаде (без автовышки и альпинистов)</li>
+                      <li>Установка внутреннего блока на высоте до 3 м</li>
+                      <li>До 3 метров трассы между блоками</li>
+                      <li>Один проход через стену (до 80 см толщиной)</li>
+                      <li>Дренаж самотёком, без дополнительных устройств</li>
+                      <li>Подключение к сети 220 В штатным кабелем</li>
+                    </ul>
+                  </div>
+                </div>
+                
+                <div className="promotion-footer">
+                  <p className="promotion-questions">💬 Остались вопросы? Пишите нам через форму связи — мы подскажем и подберём удобное время монтажа.</p>
+                  <p className="promotion-urgency">🔧 Количество ограничено — успейте оформить заявку по акции уже сегодня!</p>
+                </div>
+              </div>
+              
+              <div className="promotion-action">
+                <button 
+                  onClick={onPromoNavigate}
+                  className="btn btn-primary btn-large promotion-cta-btn"
+                >
+                  Хочу себе!
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="section">
       <div className="section-content">
         <div className="promotions-content">
           <div className="promotions-header">
             <h2 className="promotions-title">🎁 Актуальные акции</h2>
-            <p className="promotions-subtitle">Скоро здесь появятся выгодные предложения!</p>
+            <p className="promotions-subtitle">Выгодные предложения на климатическое оборудование</p>
           </div>
-          <div className="empty-promotions">
-            <div className="empty-promotions-icon">🎯</div>
-            <h3 className="empty-promotions-title">Готовим специальные предложения</h3>
-            <p className="empty-promotions-text">Следите за обновлениями, чтобы не пропустить лучшие акции на климатическое оборудование</p>
+          
+          <div className="promotions-list">
+            <div className="promotion-card">
+              <div 
+                className="promotion-card-content"
+                onClick={() => setPromotionView('details')}
+              >
+                <div className="promotion-card-header">
+                  <span className="promotion-icon">🎁</span>
+                  <h3 className="promotion-card-title">АКЦИЯ! Кондиционер HISENSE + монтаж — всего 40 990 ₽</h3>
+                </div>
+                <div className="promotion-card-footer">
+                  <span className="promotion-card-arrow">→</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

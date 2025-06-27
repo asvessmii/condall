@@ -66,18 +66,26 @@ class DatabaseBackupTest(unittest.TestCase):
         """Insert test data into MongoDB"""
         print("\n🔍 Inserting test data for backup testing...")
         
-        # Insert test product
-        await self.db.products.insert_one(self.test_product)
-        print(f"✅ Test product inserted with ID: {self.test_product['id']}")
+        # Create MongoDB client
+        client = AsyncIOMotorClient(MONGO_URL)
+        db = client[DB_NAME]
         
-        # Insert test project
-        await self.db.projects.insert_one(self.test_project)
-        print(f"✅ Test project inserted with ID: {self.test_project['id']}")
-        
-        # Count documents
-        products_count = await self.db.products.count_documents({})
-        projects_count = await self.db.projects.count_documents({})
-        print(f"✅ Database now has {products_count} products and {projects_count} projects")
+        try:
+            # Insert test product
+            await db.products.insert_one(self.test_product)
+            print(f"✅ Test product inserted with ID: {self.test_product['id']}")
+            
+            # Insert test project
+            await db.projects.insert_one(self.test_project)
+            print(f"✅ Test project inserted with ID: {self.test_project['id']}")
+            
+            # Count documents
+            products_count = await db.products.count_documents({})
+            projects_count = await db.projects.count_documents({})
+            print(f"✅ Database now has {products_count} products and {projects_count} projects")
+        finally:
+            # Close connection
+            client.close()
     
     async def clean_test_data(self):
         """Clean up test data from MongoDB"""

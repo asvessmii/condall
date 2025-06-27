@@ -109,11 +109,15 @@ class Order(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     items: List[CartItem]
     total_amount: float
+    tg_user_id: Optional[str] = None
+    tg_username: Optional[str] = None
     created_at: datetime = Field(default_factory=datetime.utcnow)
     status: str = "pending"
 
 class OrderCreate(BaseModel):
     items: List[CartItem]
+    tg_user_id: Optional[str] = None
+    tg_username: Optional[str] = None
 
 # Telegram helper functions
 async def send_telegram_message(message: str):

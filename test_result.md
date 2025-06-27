@@ -120,7 +120,6 @@ backend:
         agent: "testing"
         comment: "Проведено полное тестирование изоляции корзин пользователей. Все тесты успешно пройдены: 1) Корзины пользователей полностью изолированы - каждый пользователь видит только свои товары, 2) При добавлении одинакового товара увеличивается количество вместо создания дубликата, 3) Все API endpoints корзины корректно проверяют user_id и возвращают ошибку при его отсутствии, 4) Попытка удалить товар другого пользователя возвращает ошибку 404, 5) Очистка корзины затрагивает только корзину указанного пользователя. Проблема с общей корзиной полностью решена."
 
-backend:
   - task: "Fix Database Persistence Issue"
     implemented: true
     working: true
@@ -228,6 +227,18 @@ backend:
       - working: true
         agent: "testing"
         comment: "Comprehensive testing of product CRUD operations completed. Findings: 1) GET /api/products works correctly, returning all products. 2) POST /api/products successfully adds new products with unique IDs. 3) DELETE /api/products/{product_id} works correctly, removing products from the database. 4) Data persistence is working - products remain after backend service restart. 5) Found duplicate product names in the database, but all have unique IDs. 6) The system allows adding products with identical names, which could lead to confusion. Consider implementing uniqueness constraints or upsert functionality."
+
+  - task: "Database Backup and Restore System"
+    implemented: true
+    working: true
+    file: "server.py, database_backup.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "Tested the database backup and restore functionality. All tests passed successfully: 1) GET /api/backup/status correctly returns database status and backup information, 2) POST /api/backup/create successfully creates backup files in JSON format for all collections (products, projects, orders, feedback), 3) POST /api/backup/restore successfully restores the database from backup files, 4) Backup files are stored in the correct location (/app/backend/data) and contain valid JSON data, 5) Backup metadata is properly stored in backup_info.json with timestamp information. The backup system works as expected and allows users to backup their database to JSON files and restore them after redeployment."
 
 frontend:
   - task: "Update Frontend Cart Functions for User-Specific Cart Isolation"

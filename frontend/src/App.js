@@ -1001,6 +1001,13 @@ function App() {
     return () => clearTimeout(timer);
   }, []);
 
+  // Reset promotions count when user visits promotions section
+  useEffect(() => {
+    if (activeSection === 'promotions' && promotionsCount > 0) {
+      setPromotionsCount(0);
+    }
+  }, [activeSection, promotionsCount]);
+
   const initializeData = async () => {
     // Функция отключена - данные инициализируются вручную
     console.log('Автоматическая инициализация данных отключена');

@@ -91,6 +91,17 @@ body {
 
 .header-icon {
   font-size: var(--font-size-xl);
+  filter: drop-shadow(0 2px 4px rgba(33, 150, 243, 0.5));
+  animation: glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes glow {
+  from {
+    filter: drop-shadow(0 2px 4px rgba(33, 150, 243, 0.5));
+  }
+  to {
+    filter: drop-shadow(0 2px 8px rgba(33, 150, 243, 0.8));
+  }
 }
 
 /* Main Content */

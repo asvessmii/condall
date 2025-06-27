@@ -258,8 +258,8 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Telegram Bot Command Changes (/start and /admin)"
-    - "Telegram Bot Contact Button"
+    - "Fix Shared Cart Issue - Implement User-Specific Cart Isolation"
+    - "Update Frontend Cart Functions for User-Specific Cart Isolation"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"

@@ -86,12 +86,16 @@ class FeedbackForm(BaseModel):
     name: str
     phone: str
     message: str
+    tg_user_id: Optional[str] = None
+    tg_username: Optional[str] = None
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
 class FeedbackFormCreate(BaseModel):
     name: str
     phone: str
     message: str
+    tg_user_id: Optional[str] = None
+    tg_username: Optional[str] = None
 
 class Project(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))

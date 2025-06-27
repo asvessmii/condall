@@ -195,7 +195,7 @@ async def admin_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     admin_state.clear_state(update.effective_user.id)
     
     welcome_text = """
-🔧 **Админ панель КЛИМАТ ТЕХНО**
+🔧 **Админ панель COMFORT КЛИМАТ**
 
 Добро пожаловать в панель управления интернет-магазином кондиционеров!
 

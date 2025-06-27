@@ -263,7 +263,12 @@ async def submit_feedback(feedback_data: FeedbackFormCreate):
 @api_router.post("/orders")
 async def create_order(order_data: OrderCreate):
     total_amount = sum(item.price * item.quantity for item in order_data.items)
-    order = Order(items=order_data.items, total_amount=total_amount)
+    order = Order(
+        items=order_data.items, 
+        total_amount=total_amount,
+        tg_user_id=order_data.tg_user_id,
+        tg_username=order_data.tg_username
+    )
     await db.orders.insert_one(order.dict())
     
     # Send order to Telegram
@@ -272,21 +277,29 @@ async def create_order(order_data: OrderCreate):
         for item in order.items
     ])
     
+    # Build user info for message
+    user_info = ""
+    if order.tg_user_id:
+        user_info += f"\n🆔 <b>Telegram ID:</b> {order.tg_user_id}"
+    if order.tg_username:
+        user_info += f"\n👤 <b>Username:</b> @{order.tg_username}"
+    
     message = f"""
 🛒 <b>Новый заказ #{order.id[:8]}</b>
 
 📦 <b>Товары:</b>
 {items_text}
 
-💰 <b>Общая сумма:</b> {total_amount:,.0f} ₽
+💰 <b>Общая сумма:</b> {total_amount:,.0f} ₽{user_info}
 
 🕐 <b>Время заказа:</b> {order.created_at.strftime('%d.%m.%Y %H:%M')}
 """
     
     await send_telegram_message(message)
     
-    # Clear cart after order
-    await db.cart_items.delete_many({})
+    # Clear cart after order - need user_id to clear specific user's cart
+    if order.tg_user_id:
+        await db.cart_items.delete_many({"user_id": order.tg_user_id})
     
     return {"message": "Спасибо за заказ! Мы свяжемся с вами для подтверждения."}
 

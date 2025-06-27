@@ -388,25 +388,29 @@ class TelegramBotAdminPanelTest(unittest.TestCase):
         print("✅ Admin command blocks access for non-admin users")
 
     @patch('telegram_admin.check_admin_callback')
-    async def test_05_button_handler_main_menu(self, mock_check_admin_callback):
-        """Test button handler for main menu"""
-        print("\n🔍 Testing button handler for main menu...")
-        
-        # Mock check_admin_callback to return True
-        mock_check_admin_callback.return_value = True
+    async def test_07_contact_info_button(self, mock_check_admin_callback):
+        """Test contact info button functionality"""
+        print("\n🔍 Testing contact info button functionality...")
         
         # Set up callback query data
-        self.mock_query.data = "main_menu"
+        self.mock_query.data = "contact_info"
         
         # Call button_handler
         await self.telegram_admin.button_handler(self.mock_update, self.mock_context)
         
-        # Check if main menu was displayed
+        # Check if contact info was displayed
         self.mock_query.edit_message_text.assert_called()
         call_args = self.mock_query.edit_message_text.call_args[0][0]
-        self.assertIn("Админ панель КЛИМАТ ТЕХНО", call_args)
+        self.assertIn("Контактная информация", call_args)
+        self.assertIn("Телефон:", call_args)
+        self.assertIn("Email:", call_args)
         
-        print("✅ Button handler correctly displays main menu")
+        # Check if the keyboard has the catalog button
+        reply_markup = self.mock_query.edit_message_text.call_args[1]['reply_markup']
+        self.assertEqual(len(reply_markup.inline_keyboard), 1)
+        self.assertEqual(reply_markup.inline_keyboard[0][0].text, "🌐 Открыть каталог")
+        
+        print("✅ Contact info button correctly displays contact information")
 
     @patch('telegram_admin.check_admin_callback')
     async def test_06_button_handler_manage_products(self, mock_check_admin_callback):

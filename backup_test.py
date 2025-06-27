@@ -31,10 +31,6 @@ class DatabaseBackupTest(unittest.TestCase):
 
     def setUp(self):
         """Initialize test data"""
-        # Create MongoDB client
-        self.client = AsyncIOMotorClient(MONGO_URL)
-        self.db = self.client[DB_NAME]
-        
         # Define backup directory
         self.backup_dir = Path('/app/backend/data')
         
@@ -64,8 +60,7 @@ class DatabaseBackupTest(unittest.TestCase):
     
     def tearDown(self):
         """Clean up after tests"""
-        # Close MongoDB connection
-        self.client.close()
+        # No need to close connection here as it's handled in async methods
     
     async def insert_test_data(self):
         """Insert test data into MongoDB"""

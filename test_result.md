@@ -239,9 +239,35 @@ test_plan:
   test_all: false
   test_priority: "high_first"
 
-agent_communication:
-  - agent: "main"
-    message: "Completed implementation of comprehensive Telegram bot admin panel. Ready for testing. Bot includes: 1) Admin authentication (ID: 7470811680), 2) Complete product management (add/edit/delete with name, description, price, specs, images), 3) Complete project management (add/edit/delete with title, description, address, multiple images), 4) Image upload via base64 encoding, 5) State management for multi-step operations, 6) Inline keyboards for navigation. Bot can be started using: cd /app/backend && python telegram_admin.py"
+  - task: "Telegram Bot Command Changes (/start and /admin)"
+    implemented: true
+    working: true
+    file: "telegram_admin.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Changed command access to admin panel from /start to /admin. Now /start shows welcome message for regular users with catalog access, and /admin gives access to admin panel for administrator (ID: 7470811680)."
+      - working: true
+        agent: "testing"
+        comment: "Tested the command changes. Confirmed that /start now shows welcome message for regular users with 'Открыть каталог' button, and /admin gives access to admin panel for administrator (ID: 7470811680). Admin authentication works correctly - only user with ID 7470811680 can access admin panel. The bot is running as a supervisor service with auto-restart enabled."
+
+  - task: "Telegram Bot Contact Button"
+    implemented: true
+    working: true
+    file: "telegram_admin.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Added 'Связаться с нами' button for regular users in the /start command response. Button shows contact information when clicked."
+      - working: true
+        agent: "testing"
+        comment: "Tested the 'Связаться с нами' button functionality. Button is correctly displayed in the /start command response and shows contact information (phone, email, working hours) when clicked. The button also provides a link back to the catalog."
   - agent: "testing"
     message: "Completed testing of the Telegram Bot Admin Panel implementation. All tests passed successfully. The bot initializes correctly, authenticates admin users properly (only ID 7470811680 has access), and provides full CRUD operations for both products and projects. The main menu navigation works as expected, and all required dependencies are installed. The bot correctly handles image uploads and converts them to base64 format. All functionality is working as expected with no critical issues found."
   - agent: "user"

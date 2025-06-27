@@ -109,9 +109,13 @@ class AirConditionerShopAPITest(unittest.TestCase):
         
         product = products[0]
         
+        # Generate a unique user_id for this test
+        test_user_id = f"test_user_{uuid.uuid4().hex[:8]}"
+        
         # 1. Add to cart
         print(f"\n🔍 Testing add to cart: {product['name']}...")
         cart_data = {
+            "user_id": test_user_id,
             "product_id": product['id'],
             "quantity": 2
         }
@@ -120,26 +124,27 @@ class AirConditionerShopAPITest(unittest.TestCase):
         cart_item = response.json()
         self.assertEqual(cart_item['product_id'], product['id'])
         self.assertEqual(cart_item['quantity'], 2)
-        print(f"✅ Added to cart: {cart_item['product_name']} x {cart_item['quantity']}")
+        self.assertEqual(cart_item['user_id'], test_user_id)
+        print(f"✅ Added to cart: {cart_item['product_name']} x {cart_item['quantity']} for user {test_user_id}")
         
         # 2. Get cart
         print("\n🔍 Testing get cart...")
-        response = requests.get(f"{API_URL}/cart")
+        response = requests.get(f"{API_URL}/cart", params={"user_id": test_user_id})
         self.assertEqual(response.status_code, 200)
         cart_items = response.json()
         self.assertIsInstance(cart_items, list)
         self.assertGreater(len(cart_items), 0)
-        print(f"✅ Cart contains {len(cart_items)} items")
+        print(f"✅ Cart contains {len(cart_items)} items for user {test_user_id}")
         
         # 3. Remove from cart
         item_id = cart_items[0]['id']
         print(f"\n🔍 Testing remove from cart: {item_id}...")
-        response = requests.delete(f"{API_URL}/cart/{item_id}")
+        response = requests.delete(f"{API_URL}/cart/{item_id}", params={"user_id": test_user_id})
         self.assertEqual(response.status_code, 200)
         print("✅ Item removed from cart")
         
         # 4. Verify cart is empty
-        response = requests.get(f"{API_URL}/cart")
+        response = requests.get(f"{API_URL}/cart", params={"user_id": test_user_id})
         cart_items = response.json()
         self.assertEqual(len(cart_items), 0)
         print("✅ Cart is empty after removal")

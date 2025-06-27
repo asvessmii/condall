@@ -116,6 +116,9 @@ backend:
       - working: "NA"
         agent: "main"
         comment: "РЕАЛИЗОВАНА! Добавлены поля tg_user_id и tg_username в модель FeedbackForm и FeedbackFormCreate. Обновлен endpoint /api/feedback для получения и сохранения Telegram данных пользователя. Модифицирован шаблон уведомления в Telegram для включения ID и username пользователя."
+      - working: true
+        agent: "testing"
+        comment: "Тестирование подтвердило корректную работу API /api/feedback с Telegram данными пользователя. Проверено: 1) API принимает запросы без Telegram данных (обратная совместимость), 2) API принимает запросы с Telegram данными (tg_user_id и tg_username), 3) Данные корректно сохраняются в MongoDB, 4) Структура данных в БД соответствует новой модели FeedbackForm. Все тесты успешно пройдены."
 
   - task: "Add Telegram User Info to Order Notifications"
     implemented: true

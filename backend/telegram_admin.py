@@ -272,18 +272,90 @@ async def delete_product_confirm(query, product_id):
         reply_markup=InlineKeyboardMarkup(keyboard)
     )
 
-async def show_backup_menu(query):
-    """Show backup management menu"""
-    keyboard = [
-        [InlineKeyboardButton("📥 Создать резервную копию", callback_data="create_backup")],
-        [InlineKeyboardButton("📤 Восстановить из копии", callback_data="restore_backup")],
-        [InlineKeyboardButton("📊 Статус резервных копий", callback_data="backup_status")],
-        [InlineKeyboardButton("🔙 Назад", callback_data="main_menu")]
-    ]
+async def show_projects_menu(query):
+    """Show projects management menu"""
     await query.edit_message_text(
-        "💾 **Управление резервными копиями**\n\nВыберите действие:",
+        "🏗️ **Управление проектами**\n\nВыберите действие:",
+        parse_mode=ParseMode.MARKDOWN,
+        reply_markup=get_projects_menu_keyboard()
+    )
+
+async def show_projects_list(query, action_type):
+    """Show list of projects for editing or deletion"""
+    projects = await db.projects.find().to_list(1000)
+    
+    if not projects:
+        await query.edit_message_text(
+            "❌ Проекты не найдены",
+            reply_markup=get_back_keyboard()
+        )
+        return
+    
+    keyboard = []
+    for project in projects:
+        button_text = f"{'📝' if action_type == 'edit' else '🗑️'} {project['title']}"
+        callback_data = f"{'edit' if action_type == 'edit' else 'delete'}_project_{project['id']}"
+        keyboard.append([InlineKeyboardButton(button_text, callback_data=callback_data)])
+    keyboard.append([InlineKeyboardButton("🔙 Назад", callback_data="manage_projects")])
+    
+    await query.edit_message_text(
+        f"{'📝' if action_type == 'edit' else '🗑️'} **Выберите проект:**",
         parse_mode=ParseMode.MARKDOWN,
         reply_markup=InlineKeyboardMarkup(keyboard)
+    )
+
+async def delete_project_confirm(query, project_id):
+    """Show confirmation for project deletion"""
+    project = await db.projects.find_one({"id": project_id})
+    if not project:
+        await query.answer("❌ Проект не найден", show_alert=True)
+        return
+    
+    keyboard = [
+        [InlineKeyboardButton("✅ Да, удалить", callback_data=f"confirm_delete_project_{project_id}")],
+        [InlineKeyboardButton("❌ Нет, отменить", callback_data="manage_projects")]
+    ]
+    
+    await query.edit_message_text(
+        f"🗑️ Вы уверены, что хотите удалить проект '{project['title']}'?",
+        reply_markup=InlineKeyboardMarkup(keyboard)
+    )
+
+async def delete_project(query, project_id):
+    """Delete a project"""
+    result = await db.projects.delete_one({"id": project_id})
+    if result.deleted_count > 0:
+        await query.edit_message_text(
+            "✅ Проект успешно удален!",
+            reply_markup=get_back_keyboard()
+        )
+    else:
+        await query.edit_message_text(
+            "❌ Ошибка при удалении проекта",
+            reply_markup=get_back_keyboard()
+        )
+
+async def delete_product(query, product_id):
+    """Delete a product"""
+    result = await db.products.delete_one({"id": product_id})
+    if result.deleted_count > 0:
+        await query.edit_message_text(
+            "✅ Товар успешно удален!",
+            reply_markup=get_back_keyboard()
+        )
+    else:
+        await query.edit_message_text(
+            "❌ Ошибка при удалении товара",
+            reply_markup=get_back_keyboard()
+        )
+
+async def start_project_creation(query, user_id):
+    """Start project creation process"""
+    admin_state.set_action(user_id, "add_project_title")
+    admin_state.set_state(user_id, "new_project", {})
+    await query.edit_message_text(
+        "➕ **Добавление нового проекта**\n\n📝 Введите название проекта:",
+        parse_mode=ParseMode.MARKDOWN
     )
 
 async def create_backup_handler(query):

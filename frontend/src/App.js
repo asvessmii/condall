@@ -1032,7 +1032,7 @@ function App() {
 
   // Helper function to get user ID with fallback
   const getUserId = () => {
-    return telegramUser?.id || 'guest_user';
+    return telegramUser?.id?.toString() || 'guest_user';
   };
 
   useEffect(() => {

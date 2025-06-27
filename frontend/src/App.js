@@ -620,12 +620,70 @@ const Feedback = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
 
+  // Phone number formatting function
+  const formatPhoneNumber = (value) => {
+    // Remove all non-numeric characters except +
+    const cleaned = value.replace(/[^\d]/g, '');
+    
+    // Always start with +7
+    if (cleaned.length === 0) {
+      return '+7(';
+    }
+    
+    // If user tries to clear the +7 part, restore it
+    if (cleaned.length <= 1) {
+      return '+7(';
+    }
+    
+    // Take up to 10 digits after the country code
+    const phoneNumber = cleaned.slice(1, 11); // Skip the first digit (7) and take max 10 digits
+    
+    let formatted = '+7(';
+    
+    if (phoneNumber.length > 0) {
+      formatted += phoneNumber.slice(0, 3);
+    }
+    if (phoneNumber.length > 3) {
+      formatted += ') ' + phoneNumber.slice(3, 6);
+    }
+    if (phoneNumber.length > 6) {
+      formatted += '-' + phoneNumber.slice(6, 8);
+    }
+    if (phoneNumber.length > 8) {
+      formatted += '-' + phoneNumber.slice(8, 10);
+    }
+    
+    return formatted;
+  };
+
+  const handlePhoneChange = (e) => {
+    const inputValue = e.target.value;
+    
+    // If user tries to delete the +7( part, restore it
+    if (inputValue.length < 3) {
+      setFormData({ ...formData, phone: '+7(' });
+      return;
+    }
+    
+    const formatted = formatPhoneNumber(inputValue);
+    setFormData({ ...formData, phone: formatted });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
     
     try {
-      await axios.post(`${API}/feedback`, formData);
+      // Get Telegram user data
+      const telegramUser = getTelegramUser();
+      
+      const submitData = {
+        ...formData,
+        tg_user_id: telegramUser?.id?.toString() || null,
+        tg_username: telegramUser?.username || null
+      };
+      
+      await axios.post(`${API}/feedback`, submitData);
       setFormData({ name: '', phone: '', message: '' });
       setShowSuccess(true);
       setTimeout(() => setShowSuccess(false), 5000);
@@ -668,9 +726,14 @@ const Feedback = () => {
                 type="tel"
                 required
                 value={formData.phone}
-                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                onChange={handlePhoneChange}
                 className="form-input"
-                placeholder="+7 (000) 000-00-00"
+                placeholder="+7(000) 000-00-00"
+                onFocus={(e) => {
+                  if (!e.target.value) {
+                    setFormData({ ...formData, phone: '+7(' });
+                  }
+                }}
               />
             </div>
             

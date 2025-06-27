@@ -211,8 +211,8 @@ class AirConditionerShopAPITest(unittest.TestCase):
         self.assertGreater(len(project['images']), 0)
         print(f"✅ Project has {len(project['images'])} images")
 
-    def test_08_order_creation(self):
-        """Test order creation"""
+    def test_08a_order_creation_without_tg_data(self):
+        """Test order creation without Telegram data"""
         # First add items to cart
         response = requests.get(f"{API_URL}/products")
         products = response.json()
@@ -221,8 +221,12 @@ class AirConditionerShopAPITest(unittest.TestCase):
         
         product = products[0]
         
+        # Generate a unique user_id for this test
+        test_user_id = f"test_user_{uuid.uuid4().hex[:8]}"
+        
         # Add to cart
         cart_data = {
+            "user_id": test_user_id,
             "product_id": product['id'],
             "quantity": 1
         }
@@ -230,11 +234,11 @@ class AirConditionerShopAPITest(unittest.TestCase):
         cart_item = response.json()
         
         # Get cart
-        response = requests.get(f"{API_URL}/cart")
+        response = requests.get(f"{API_URL}/cart", params={"user_id": test_user_id})
         cart_items = response.json()
         
         # Create order
-        print("\n🔍 Testing order creation...")
+        print("\n🔍 Testing order creation without Telegram data...")
         order_data = {
             "items": cart_items
         }
@@ -243,10 +247,69 @@ class AirConditionerShopAPITest(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         data = response.json()
         self.assertIn("message", data)
-        print(f"✅ Order created successfully: {data['message']}")
+        print(f"✅ Order created successfully without Telegram data: {data['message']}")
         
         # Verify cart is cleared after order
-        response = requests.get(f"{API_URL}/cart")
+        response = requests.get(f"{API_URL}/cart", params={"user_id": test_user_id})
+        cart_items = response.json()
+        self.assertEqual(len(cart_items), 0)
+        print("✅ Cart is cleared after order creation")
+        
+    def test_08b_order_creation_with_tg_data(self):
+        """Test order creation with Telegram data"""
+        # First add items to cart
+        response = requests.get(f"{API_URL}/products")
+        products = response.json()
+        if not products:
+            self.fail("No products available to test order")
+        
+        product = products[0]
+        
+        # Generate a unique user_id for this test
+        test_user_id = f"test_user_{uuid.uuid4().hex[:8]}"
+        
+        # Add to cart
+        cart_data = {
+            "user_id": test_user_id,
+            "product_id": product['id'],
+            "quantity": 1
+        }
+        response = requests.post(f"{API_URL}/cart", json=cart_data)
+        cart_item = response.json()
+        
+        # Get cart
+        response = requests.get(f"{API_URL}/cart", params={"user_id": test_user_id})
+        cart_items = response.json()
+        
+        # Create order with Telegram data
+        print("\n🔍 Testing order creation with Telegram data...")
+        order_data = {
+            "items": cart_items,
+            "tg_user_id": "87654321",
+            "tg_username": "order_test_user"
+        }
+        
+        response = requests.post(f"{API_URL}/orders", json=order_data)
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertIn("message", data)
+        print(f"✅ Order created successfully with Telegram data: {data['message']}")
+        
+        # Verify data was saved to MongoDB
+        client = AsyncIOMotorClient(MONGO_URL)
+        db = client[DB_NAME]
+        
+        # Run in event loop to use async functions
+        loop = asyncio.get_event_loop()
+        order = loop.run_until_complete(db.orders.find_one({"tg_user_id": "87654321"}))
+        
+        self.assertIsNotNone(order)
+        self.assertEqual(order["tg_user_id"], "87654321")
+        self.assertEqual(order["tg_username"], "order_test_user")
+        print("✅ Verified Telegram data was saved to MongoDB")
+        
+        # Verify cart is cleared after order
+        response = requests.get(f"{API_URL}/cart", params={"user_id": test_user_id})
         cart_items = response.json()
         self.assertEqual(len(cart_items), 0)
         print("✅ Cart is cleared after order creation")

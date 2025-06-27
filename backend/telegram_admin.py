@@ -26,14 +26,14 @@ load_dotenv()
 
 
 # Configure logging
-logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
+logging.basicConfig(format=\'%(asctime)s - %(name)s - %(levelname)s - %(message)s\', level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Admin configuration
 ADMIN_ID = int(os.environ.get("ADMIN_ID", 0))
-BOT_TOKEN = os.environ.get('BOT_TOKEN')
-MONGO_URL = os.environ.get('MONGO_URL')
-DB_NAME = os.environ.get('DB_NAME')
+BOT_TOKEN = os.environ.get(\'BOT_TOKEN\')
+MONGO_URL = os.environ.get(\'MONGO_URL\')
+DB_NAME = os.environ.get(\'DB_NAME\')
 
 # Initialize MongoDB connection
 client = AsyncIOMotorClient(MONGO_URL)
@@ -58,10 +58,10 @@ class AdminState:
             del self.states[user_id]
     
     def get_action(self, user_id: int) -> Optional[str]:
-        return self.get_state(user_id).get('action')
+        return self.get_state(user_id).get(\'action\')
     
     def set_action(self, user_id: int, action: str):
-        self.set_state(user_id, 'action', action)
+        self.set_state(user_id, \'action\', action)
 
 
 # Global state manager
@@ -176,7 +176,7 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     keyboard = [
         [InlineKeyboardButton("🌐 Открыть каталог", web_app=WebAppInfo(url="https://9dda70b2-da78-4938-b724-97660dc76fa5.preview.emergentagent.com"))],
-        [InlineKeyboardButton("📞 Связаться с нами", web_app=WebAppInfo(url="https://9dda70b2-da78-4938-b724-97660dc76fa5.preview.emergentagent.com#feedback"))]
+        [InlineKeyboardButton("📞 Связаться с нами", web_app=WebAppInfo(url="https://9dda70b2-da78-4938-b724-97660dc76fa5.preview.emergentagent.com#contact"))]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     
@@ -244,13 +244,13 @@ async def show_products_list(query, action_type):
     
     keyboard = []
     for product in products:
-        button_text = f"{'📝' if action_type == 'edit' else '🗑️'} {product['name']}"
-        callback_data = f"{'edit' if action_type == 'edit' else 'delete'}_product_{product['id']}"
+        button_text = f"{\'📝\' if action_type == \'edit\' else \'🗑️\'} {product[\'name\]}"
+        callback_data = f"{\'edit\' if action_type == \'edit\' else \'delete\'}_product_{product[\'id\]}"
         keyboard.append([InlineKeyboardButton(button_text, callback_data=callback_data)])
     keyboard.append([InlineKeyboardButton("🔙 Назад", callback_data="manage_products")])
     
     await query.edit_message_text(
-        f"{'📝' if action_type == 'edit' else '🗑️'} **Выберите товар:**",
+        f"{\'📝\' if action_type == \'edit\' else \'🗑️\'} **Выберите товар:**",
         parse_mode=ParseMode.MARKDOWN,
         reply_markup=InlineKeyboardMarkup(keyboard)
     )
@@ -268,7 +268,7 @@ async def delete_product_confirm(query, product_id):
     ]
     
     await query.edit_message_text(
-        f"🗑️ Вы уверены, что хотите удалить товар '{product['name']}'?",
+        f"🗑️ Вы уверены, что хотите удалить товар \'{product[\'name\]}\'?",
         reply_markup=InlineKeyboardMarkup(keyboard)
     )
 
@@ -293,13 +293,13 @@ async def show_projects_list(query, action_type):
     
     keyboard = []
     for project in projects:
-        button_text = f"{'📝' if action_type == 'edit' else '🗑️'} {project['title']}"
-        callback_data = f"{'edit' if action_type == 'edit' else 'delete'}_project_{project['id']}"
+        button_text = f"{\'📝\' if action_type == \'edit\' else \'🗑️\'} {project[\'title\]}"
+        callback_data = f"{\'edit\' if action_type == \'edit\' else \'delete\'}_project_{project[\'id\]}"
         keyboard.append([InlineKeyboardButton(button_text, callback_data=callback_data)])
     keyboard.append([InlineKeyboardButton("🔙 Назад", callback_data="manage_projects")])
     
     await query.edit_message_text(
-        f"{'📝' if action_type == 'edit' else '🗑️'} **Выберите проект:**",
+        f"{\'📝\' if action_type == \'edit\' else \'🗑️\'} **Выберите проект:**",
         parse_mode=ParseMode.MARKDOWN,
         reply_markup=InlineKeyboardMarkup(keyboard)
     )
@@ -317,7 +317,7 @@ async def delete_project_confirm(query, project_id):
     ]
     
     await query.edit_message_text(
-        f"🗑️ Вы уверены, что хотите удалить проект '{project['title']}'?",
+        f"🗑️ Вы уверены, что хотите удалить проект \'{project[\'title\]}\'?",
         reply_markup=InlineKeyboardMarkup(keyboard)
     )
 
@@ -447,280 +447,157 @@ async def show_backup_status(query):
         )
     except Exception as e:
         await query.edit_message_text(
-            f"❌ Ошибка при получении статуса: {str(e)}",
+            f"❌ Ошибка при получении списка резервных копий: {str(e)}",
             reply_markup=get_back_keyboard()
         )
 
-async def show_backup_status(query):
-    """Show backup status"""
-    if DatabaseBackup is None:
-        await query.edit_message_text(
-            "❌ Модуль резервного копирования недоступен",
-            reply_markup=get_back_keyboard()
-        )
-        return
-    
-    try:
-        backup = DatabaseBackup()
-        status = await backup.get_database_status()
-        
-        text = "📊 **Статус базы данных:**\n\n"
-        for collection, count in status.items():
-            if collection not in ['total', 'has_data']:
-                text += f"📋 {collection}: {count} записей\n"
-        
-        text += f"\n📈 **Всего записей:** {status.get('total', 0)}"
-        text += f"\n🔄 **Статус:** {'База заполнена' if status.get('has_data', False) else 'База пуста'}"
-        
-        await backup.close()
-        await query.edit_message_text(
-            text,
-            parse_mode=ParseMode.MARKDOWN,
-            reply_markup=get_back_keyboard()
-        )
-    except Exception as e:
-        await query.edit_message_text(
-            f"❌ Ошибка при получении статуса: {str(e)}",
-            reply_markup=get_back_keyboard()
-        )
 
-async def create_backup_handler(query):
-    """Handle backup creation"""
-    if DatabaseBackup is None:
-        await query.edit_message_text(
-            "❌ Модуль резервного копирования недоступен",
-            reply_markup=get_back_keyboard()
-        )
-        return
-    
-    try:
-        await query.edit_message_text(
-            "⏳ Создание резервной копии...",
-            reply_markup=None
-        )
-        
-        backup = DatabaseBackup()
-        success = await backup.create_backup()
-        await backup.close()
-        
-        if success:
-            await query.edit_message_text(
-                "✅ **Резервная копия создана успешно!**\n\n"
-                "📁 Данные сохранены в папке /backend/data/\n"
-                "🕐 Время создания: " + datetime.now().strftime('%d.%m.%Y %H:%M'),
-                parse_mode=ParseMode.MARKDOWN,
-                reply_markup=get_back_keyboard()
-            )
-        else:
-            await query.edit_message_text(
-                "❌ Ошибка при создании резервной копии",
-                reply_markup=get_back_keyboard()
-            )
-    except Exception as e:
-        await query.edit_message_text(
-            f"❌ Ошибка при создании резервной копии: {str(e)}",
-            reply_markup=get_back_keyboard()
-        )
-
-async def restore_backup_handler(query):
-    """Handle backup restoration"""
-    if DatabaseBackup is None:
-        await query.edit_message_text(
-            "❌ Модуль резервного копирования недоступен",
-            reply_markup=get_back_keyboard()
-        )
-        return
-    
-    keyboard = [
-        [InlineKeyboardButton("✅ Да, восстановить", callback_data="confirm_restore_backup")],
-        [InlineKeyboardButton("❌ Нет, отменить", callback_data="backup_menu")]
-    ]
-    
-    await query.edit_message_text(
-        "⚠️ **Внимание!**\n\n"
-        "Восстановление резервной копии заменит все текущие данные в базе данных "
-        "на данные из резервной копии.\n\n"
-        "🔄 Этот процесс нельзя отменить!\n\n"
-        "Продолжить восстановление?",
-        parse_mode=ParseMode.MARKDOWN,
-        reply_markup=InlineKeyboardMarkup(keyboard)
-    )
-
-async def confirm_restore_backup(query):
-    """Execute backup restoration"""
-    if DatabaseBackup is None:
-        await query.edit_message_text(
-            "❌ Модуль резервного копирования недоступен",
-            reply_markup=get_back_keyboard()
-        )
-        return
-    
-    try:
-        await query.edit_message_text(
-            "⏳ Восстановление из резервной копии...",
-            reply_markup=None
-        )
-        
-        backup = DatabaseBackup()
-        success = await backup.restore_backup()
-        await backup.close()
-        
-        if success:
-            await query.edit_message_text(
-                "✅ **Данные восстановлены успешно!**\n\n"
-                "🔄 База данных восстановлена из резервной копии\n"
-                "🕐 Время восстановления: " + datetime.now().strftime('%d.%m.%Y %H:%M'),
-                parse_mode=ParseMode.MARKDOWN,
-                reply_markup=get_back_keyboard()
-            )
-        else:
-            await query.edit_message_text(
-                "❌ Ошибка при восстановлении данных",
-                reply_markup=get_back_keyboard()
-            )
-    except Exception as e:
-        await query.edit_message_text(
-            f"❌ Ошибка при восстановлении: {str(e)}",
-            reply_markup=get_back_keyboard()
-        )
-
-async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Handle button clicks"""
+async def edit_product_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
-    
-    user_id = query.from_user.id
     data = query.data
-    
-    # Check admin access for admin functions
-    if data != "main_menu" and data != "open_catalog" and data != "contact_us":
-        if user_id != ADMIN_ID:
-            await query.answer("❌ У вас нет прав доступа", show_alert=True)
-            return
-    
-    # Main menu navigation
-    if data == "main_menu":
-        await query.edit_message_text(
-            "🏠 **Главное меню администратора**\n\nВыберите действие:",
-            parse_mode=ParseMode.MARKDOWN,
-            reply_markup=get_main_menu_keyboard()
-        )
-    
-    elif data == "manage_products":
-        await query.edit_message_text(
-            "📦 **Управление товарами**\n\nВыберите действие:",
-            parse_mode=ParseMode.MARKDOWN,
-            reply_markup=get_products_menu_keyboard()
-        )
-    
-    elif data == "manage_projects":
-        await query.edit_message_text(
-            "🏗️ **Управление проектами**\n\nВыберите действие:",
-            parse_mode=ParseMode.MARKDOWN,
-            reply_markup=get_projects_menu_keyboard()
-        )
-    
-    elif data == "add_product":
-        admin_state.set_action(user_id, "add_product_name")
-        admin_state.set_state(user_id, "new_product", {})
-        await query.edit_message_text(
-            "➕ **Добавление нового товара**\n\n📝 Введите название товара:",
-            parse_mode=ParseMode.MARKDOWN
-        )
-    
-    elif data == "add_project":
-        admin_state.set_action(user_id, "add_project_title")
-        admin_state.set_state(user_id, "new_project", {})
-        await query.edit_message_text(
-            "➕ **Добавление нового проекта**\n\n📝 Введите название проекта:",
-            parse_mode=ParseMode.MARKDOWN
-        )
-    
-    elif data == "list_products":
-        await list_products(query)
-    
-    elif data == "list_projects":
-        await list_projects(query)
-    
-    elif data == "edit_product":
-        await show_products_for_edit(query)
-    
-    elif data == "edit_project":
-        await show_projects_for_edit(query)
-    
-    elif data == "delete_product":
-        await show_products_for_delete(query)
-    
-    elif data == "delete_project":
-        await show_projects_for_delete(query)
-    
-    elif data.startswith("edit_product_"):
+    user_id = query.from_user.id
+
+    if data.startswith("edit_product_"):
         product_id = data.replace("edit_product_", "")
-        await start_product_edit(query, product_id)
-    
-    elif data.startswith("edit_project_"):
+        product = await db.products.find_one({"id": product_id})
+        if not product:
+            await query.edit_message_text("❌ Товар не найден", reply_markup=get_back_keyboard())
+            return
+
+        keyboard = [
+            [InlineKeyboardButton(f"📝 Название: {product.get(\'name\', \'Не указано\')}", callback_data=f"edit_product_name_{product_id}")],
+            [InlineKeyboardButton(f"📝 Краткое описание: {product.get(\'short_description\', \'Не указано\')}", callback_data=f"edit_product_short_desc_{product_id}")],
+            [InlineKeyboardButton(f"📝 Описание: {product.get(\'description\', \'Не указано\')}", callback_data=f"edit_product_desc_{product_id}")],
+            [InlineKeyboardButton(f"💰 Цена: {product.get(\'price\', \'Не указано\')}", callback_data=f"edit_product_price_{product_id}")],
+            [InlineKeyboardButton("⚙️ Характеристики", callback_data=f"edit_product_specs_{product_id}")],
+            [InlineKeyboardButton("📷 Изображение", callback_data=f"edit_product_image_{product_id}")],
+            [InlineKeyboardButton("🔙 Назад", callback_data="manage_products")]
+        ]
+        await query.edit_message_text(
+            f"📝 **Редактирование товара: {product.get(\'name\', \'\')}**\n\nВыберите, что хотите изменить:",
+            parse_mode=ParseMode.MARKDOWN,
+            reply_markup=InlineKeyboardMarkup(keyboard)
+        )
+
+
+async def edit_project_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    await query.answer()
+    data = query.data
+    user_id = query.from_user.id
+
+    if data.startswith("edit_project_"):
         project_id = data.replace("edit_project_", "")
-        await start_project_edit(query, project_id)
-    
+        project = await db.projects.find_one({"id": project_id})
+        if not project:
+            await query.edit_message_text("❌ Проект не найден", reply_markup=get_back_keyboard())
+            return
+
+        keyboard = [
+            [InlineKeyboardButton(f"📝 Название: {project.get(\'title\', \'Не указано\')}", callback_data=f"edit_project_title_{project_id}")],
+            [InlineKeyboardButton(f"📝 Описание: {project.get(\'description\', \'Не указано\')}", callback_data=f"edit_project_desc_{project_id}")],
+            [InlineKeyboardButton(f"📍 Адрес: {project.get(\'address\', \'Не указано\')}", callback_data=f"edit_project_address_{project_id}")],
+            [InlineKeyboardButton("📷 Изображения", callback_data=f"edit_project_images_{project_id}")],
+            [InlineKeyboardButton("🔙 Назад", callback_data="manage_projects")]
+        ]
+        await query.edit_message_text(
+            f"📝 **Редактирование проекта: {project.get(\'title\', \'\')}**\n\nВыберите, что хотите изменить:",
+            parse_mode=ParseMode.MARKDOWN,
+            reply_markup=InlineKeyboardMarkup(keyboard)
+        )
+
+
+async def callback_query_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    await query.answer()
+    data = query.data
+    user_id = query.from_user.id
+
+    if data == "manage_products":
+        await show_products_menu(query)
+    elif data == "manage_projects":
+        await show_projects_menu(query)
+    elif data == "main_menu":
+        await admin_command(update, context)
+    elif data == "add_product":
+        await start_product_creation(query, user_id)
+    elif data == "edit_product":
+        await show_products_list(query, "edit")
+    elif data == "delete_product":
+        await show_products_list(query, "delete")
     elif data.startswith("delete_product_"):
         product_id = data.replace("delete_product_", "")
+        await delete_product_confirm(query, product_id)
+    elif data.startswith("confirm_delete_product_"):
+        product_id = data.replace("confirm_delete_product_", "")
         await delete_product(query, product_id)
-    
+    elif data == "add_project":
+        await start_project_creation(query, user_id)
+    elif data == "edit_project":
+        await show_projects_list(query, "edit")
+    elif data == "delete_project":
+        await show_projects_list(query, "delete")
     elif data.startswith("delete_project_"):
         project_id = data.replace("delete_project_", "")
+        await delete_project_confirm(query, project_id)
+    elif data.startswith("confirm_delete_project_"):
+        project_id = data.replace("confirm_delete_project_", "")
         await delete_project(query, project_id)
-    
+    elif data == "backup_menu":
+        await show_backup_menu(query)
+    elif data == "create_backup":
+        await create_backup_handler(query)
+    elif data == "restore_backup":
+        await restore_backup_handler(query)
+    elif data == "backup_status":
+        await show_backup_status(query)
+    elif data.startswith("restore_"):
+        filename = data.replace("restore_", "")
+        if DatabaseBackup is None:
+            await query.edit_message_text(
+                "❌ Модуль резервного копирования недоступен",
+                reply_markup=get_back_keyboard()
+            )
+            return
+        try:
+            backup = DatabaseBackup()
+            await backup.restore_backup(filename)
+            await query.edit_message_text(
+                f"✅ База данных успешно восстановлена из {filename}!",
+                reply_markup=get_back_keyboard()
+            )
+        except Exception as e:
+            await query.edit_message_text(
+                f"❌ Ошибка при восстановлении резервной копии: {str(e)}",
+                reply_markup=get_back_keyboard()
+            )
     elif data == "statistics":
-        await show_statistics(query)
-    
-    elif data == "finish_project":
-        user_id = query.from_user.id
-        await finish_project_creation(query, user_id)
-    
-    elif data == "continue_images":
-        await query.edit_message_text(
-            "📷 Отправьте еще одно изображение проекта:",
-            parse_mode=ParseMode.MARKDOWN
-        )
-    
-    elif data == "finish_project_images":
-        user_id = query.from_user.id
-        await finish_project_images_edit(query, user_id)
-    
-    elif data == "continue_project_images":
-        await query.edit_message_text(
-            "📷 Отправьте еще одно изображение проекта:",
-            parse_mode=ParseMode.MARKDOWN
-        )
-    
+        await query.edit_message_text("📊 Статистика пока недоступна.", reply_markup=get_back_keyboard())
+
     # Product editing handlers
     elif data.startswith("edit_product_name_"):
         product_id = data.replace("edit_product_name_", "")
-        user_id = query.from_user.id
         admin_state.set_action(user_id, f"edit_product_name_{product_id}")
         await query.edit_message_text("📝 Введите новое название товара:")
     
     elif data.startswith("edit_product_short_desc_"):
         product_id = data.replace("edit_product_short_desc_", "")
-        user_id = query.from_user.id
         admin_state.set_action(user_id, f"edit_product_short_desc_{product_id}")
         await query.edit_message_text("📝 Введите новое краткое описание товара:")
     
     elif data.startswith("edit_product_desc_"):
         product_id = data.replace("edit_product_desc_", "")
-        user_id = query.from_user.id
         admin_state.set_action(user_id, f"edit_product_desc_{product_id}")
         await query.edit_message_text("📝 Введите новое подробное описание товара:")
     
     elif data.startswith("edit_product_price_"):
         product_id = data.replace("edit_product_price_", "")
-        user_id = query.from_user.id
         admin_state.set_action(user_id, f"edit_product_price_{product_id}")
         await query.edit_message_text("💰 Введите новую цену товара:")
     
     elif data.startswith("edit_product_specs_"):
         product_id = data.replace("edit_product_specs_", "")
-        user_id = query.from_user.id
         admin_state.set_action(user_id, f"edit_product_specs_{product_id}")
         await query.edit_message_text(
             "⚙️ Введите новые характеристики товара в формате:\n"
@@ -730,32 +607,27 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     elif data.startswith("edit_product_image_"):
         product_id = data.replace("edit_product_image_", "")
-        user_id = query.from_user.id
         admin_state.set_action(user_id, f"edit_product_image_{product_id}")
         await query.edit_message_text("📷 Отправьте новое изображение товара:")
     
     # Project editing handlers
     elif data.startswith("edit_project_title_"):
         project_id = data.replace("edit_project_title_", "")
-        user_id = query.from_user.id
         admin_state.set_action(user_id, f"edit_project_title_{project_id}")
         await query.edit_message_text("📝 Введите новое название проекта:")
     
     elif data.startswith("edit_project_desc_"):
         project_id = data.replace("edit_project_desc_", "")
-        user_id = query.from_user.id
         admin_state.set_action(user_id, f"edit_project_desc_{project_id}")
         await query.edit_message_text("📝 Введите новое описание проекта:")
     
     elif data.startswith("edit_project_address_"):
         project_id = data.replace("edit_project_address_", "")
-        user_id = query.from_user.id
         admin_state.set_action(user_id, f"edit_project_address_{project_id}")
         await query.edit_message_text("📍 Введите новый адрес проекта:")
     
     elif data.startswith("edit_project_images_"):
         project_id = data.replace("edit_project_images_", "")
-        user_id = query.from_user.id
         admin_state.set_action(user_id, f"edit_project_images_{project_id}")
         admin_state.set_state(user_id, "new_project_images", [])
         await query.edit_message_text("📷 Отправьте новые изображения проекта:")
@@ -837,9 +709,9 @@ async def message_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     elif action == "add_product_specifications":
         specifications = {}
-        for line in text.split('\n'):
-            if ':' in line:
-                key, value = line.split(':', 1)
+        for line in text.split(\'\n\'):
+            if \':\' in line:
+                key, value = line.split(\':\', 1)
                 specifications[key.strip()] = value.strip()
         
         product_data = admin_state.get_state(user_id).get("new_product", {})
@@ -923,9 +795,9 @@ async def message_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     elif action.startswith("edit_product_specs_"):
         specifications = {}
-        for line in text.split('\n'):
-            if ':' in line:
-                key, value = line.split(':', 1)
+        for line in text.split(\'\n\'):
+            if \':\' in line:
+                key, value = line.split(\':\', 1)
                 specifications[key.strip()] = value.strip()
         
         product_id = action.replace("edit_product_specs_", "")
@@ -992,67 +864,30 @@ async def photo_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         
         # Convert to base64
         photo_bytes = await file.download_as_bytearray()
-        image_base64 = base64.b64encode(photo_bytes).decode('utf-8')
+        image_base64 = base64.b64encode(photo_bytes).decode(\'utf-8\')
         
         # Save product
         product_data = admin_state.get_state(user_id).get("new_product", {})
         product_data["image_url"] = f"data:image/jpeg;base64,{image_base64}"
         product_data["created_at"] = datetime.utcnow()
+        product_data["id"] = str(db.products.count_documents({}) + 1) # Simple ID generation
         
-        # Generate UUID for product
-        import uuid
-        if "id" not in product_data:
-            product_data["id"] = str(uuid.uuid4())
-        
-        # Save to database
         await db.products.insert_one(product_data)
         admin_state.clear_state(user_id)
         await update.message.reply_text(
-            f"✅ Товар '{product_data['name']}' успешно добавлен!",
+            "✅ Товар успешно добавлен!",
             reply_markup=get_main_menu_keyboard()
         )
     
-    elif action == "add_project_images":
-        # Download photo
-        photo = update.message.photo[-1]
-        file = await context.bot.get_file(photo.file_id)
-        
-        # Convert to base64
-        photo_bytes = await file.download_as_bytearray()
-        image_base64 = base64.b64encode(photo_bytes).decode('utf-8')
-        
-        # Add to project images
-        project_data = admin_state.get_state(user_id).get("new_project", {})
-        if "images" not in project_data:
-            project_data["images"] = []
-        project_data["images"].append(f"data:image/jpeg;base64,{image_base64}")
-        admin_state.set_state(user_id, "new_project", project_data)
-        
-        # Ask for more images or finish
-        keyboard = [
-            [InlineKeyboardButton("✅ Завершить", callback_data="finish_project")],
-            [InlineKeyboardButton("➕ Добавить еще фото", callback_data="continue_images")]
-        ]
-        reply_markup = InlineKeyboardMarkup(keyboard)
-        
-        await update.message.reply_text(
-            f"📷 Изображение добавлено! Всего: {len(project_data['images'])}\n\n"
-            "Хотите добавить еще изображения?",
-            reply_markup=reply_markup
-        )
-    
     elif action.startswith("edit_product_image_"):
-        # Download photo
+        product_id = action.replace("edit_product_image_", "")
         photo = update.message.photo[-1]
         file = await context.bot.get_file(photo.file_id)
-        
-        # Convert to base64
         photo_bytes = await file.download_as_bytearray()
-        image_base64 = base64.b64encode(photo_bytes).decode('utf-8')
+        image_base64 = base64.b64encode(photo_bytes).decode(\'utf-8\')
         
-        product_id = action.replace("edit_product_image_", "")
         await db.products.update_one(
-            {"id": product_id}, 
+            {"id": product_id},
             {"$set": {"image_url": f"data:image/jpeg;base64,{image_base64}"}}
         )
         admin_state.clear_state(user_id)
@@ -1061,396 +896,159 @@ async def photo_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             reply_markup=get_main_menu_keyboard()
         )
     
-    elif action.startswith("edit_project_images_"):
-        # Download photo
+    elif action == "add_project_images":
+        project_data = admin_state.get_state(user_id).get("new_project", {})
+        current_images = project_data.get("image_urls", [])
+        
         photo = update.message.photo[-1]
         file = await context.bot.get_file(photo.file_id)
-        
-        # Convert to base64
         photo_bytes = await file.download_as_bytearray()
-        image_base64 = base64.b64encode(photo_bytes).decode('utf-8')
+        image_base64 = base64.b64encode(photo_bytes).decode(\'utf-8\')
+        current_images.append(f"data:image/jpeg;base64,{image_base64}")
         
-        # Add to new images list
-        new_images = admin_state.get_state(user_id).get("new_project_images", [])
-        new_images.append(f"data:image/jpeg;base64,{image_base64}")
-        admin_state.set_state(user_id, "new_project_images", new_images)
+        admin_state.set_state(user_id, "new_project", {"image_urls": current_images})
         
-        # Ask for more images or finish
         keyboard = [
-            [InlineKeyboardButton("✅ Завершить", callback_data="finish_project_images")],
-            [InlineKeyboardButton("➕ Добавить еще фото", callback_data="continue_project_images")]
+            [InlineKeyboardButton("✅ Готово", callback_data="finish_add_project_images")],
+            [InlineKeyboardButton("➕ Добавить еще", callback_data="add_more_project_images")]
         ]
-        reply_markup = InlineKeyboardMarkup(keyboard)
-        
         await update.message.reply_text(
-            f"📷 Изображение добавлено! Всего: {len(new_images)}\n\n"
-            "Хотите добавить еще изображения?",
-            reply_markup=reply_markup
+            "📷 Изображение добавлено. Отправьте еще или нажмите \"Готово\":",
+            reply_markup=InlineKeyboardMarkup(keyboard)
+        )
+    
+    elif action.startswith("edit_project_images_"):
+        project_id = action.replace("edit_project_images_", "")
+        project = await db.projects.find_one({"id": project_id})
+        if not project:
+            await update.message.reply_text("❌ Проект не найден", reply_markup=get_back_keyboard())
+            return
+
+        current_images = project.get("image_urls", [])
+        photo = update.message.photo[-1]
+        file = await context.bot.get_file(photo.file_id)
+        photo_bytes = await file.download_as_bytearray()
+        image_base64 = base64.b64encode(photo_bytes).decode(\'utf-8\')
+        current_images.append(f"data:image/jpeg;base64,{image_base64}")
+
+        await db.projects.update_one(
+            {"id": project_id},
+            {"$set": {"image_urls": current_images}}
+        )
+        
+        keyboard = [
+            [InlineKeyboardButton("✅ Готово", callback_data="finish_edit_project_images")],
+            [InlineKeyboardButton("➕ Добавить еще", callback_data="add_more_project_images")]
+        ]
+        await update.message.reply_text(
+            "📷 Изображение добавлено. Отправьте еще или нажмите \"Готово\":",
+            reply_markup=InlineKeyboardMarkup(keyboard)
         )
 
 
-async def list_products(query):
-    """List all products"""
-    products = await db.products.find().to_list(1000)
-    
-    if not products:
-        await query.edit_message_text(
-            "📦 **Список товаров**\n\n❌ Товары не найдены",
-            parse_mode=ParseMode.MARKDOWN,
-            reply_markup=get_back_keyboard()
-        )
-        return
-    
-    text = "📦 **Список товаров:**\n\n"
-    for i, product in enumerate(products, 1):
-        text += f"{i}. **{product['name']}**\n"
-        text += f"   💰 {product['price']:,.0f} ₽\n"
-        text += f"   📝 {product['short_description']}\n\n"
-    
-    await query.edit_message_text(
-        text,
-        parse_mode=ParseMode.MARKDOWN,
-        reply_markup=get_back_keyboard()
-    )
-
-
-async def list_projects(query):
-    """List all projects"""
-    projects = await db.projects.find().to_list(1000)
-    
-    if not projects:
-        await query.edit_message_text(
-            "🏗️ **Список проектов**\n\n❌ Проекты не найдены",
-            parse_mode=ParseMode.MARKDOWN,
-            reply_markup=get_back_keyboard()
-        )
-        return
-    
-    text = "🏗️ **Список проектов:**\n\n"
-    for i, project in enumerate(projects, 1):
-        text += f"{i}. **{project['title']}**\n"
-        text += f"   📍 {project['address']}\n"
-        text += f"   📷 {len(project.get('images', []))} изображений\n\n"
-    
-    await query.edit_message_text(
-        text,
-        parse_mode=ParseMode.MARKDOWN,
-        reply_markup=get_back_keyboard()
-    )
-
-
-async def show_products_for_edit(query):
-    """Show products for editing"""
-    products = await db.products.find().to_list(1000)
-    
-    if not products:
-        await query.edit_message_text(
-            "❌ Товары не найдены",
-            reply_markup=get_back_keyboard()
-        )
-        return
-    
-    keyboard = []
-    for product in products:
-        keyboard.append([InlineKeyboardButton(
-            f"📝 {product['name']}", 
-            callback_data=f"edit_product_{product['id']}"
-        )])
-    keyboard.append([InlineKeyboardButton("🔙 Назад", callback_data="manage_products")])
-    
-    await query.edit_message_text(
-        "📝 **Выберите товар для редактирования:**",
-        parse_mode=ParseMode.MARKDOWN,
-        reply_markup=InlineKeyboardMarkup(keyboard)
-    )
-
-
-async def show_projects_for_edit(query):
-    """Show projects for editing"""
-    projects = await db.projects.find().to_list(1000)
-    
-    if not projects:
-        await query.edit_message_text(
-            "❌ Проекты не найдены",
-            reply_markup=get_back_keyboard()
-        )
-        return
-    
-    keyboard = []
-    for project in projects:
-        keyboard.append([InlineKeyboardButton(
-            f"📝 {project['title']}", 
-            callback_data=f"edit_project_{project['id']}"
-        )])
-    keyboard.append([InlineKeyboardButton("🔙 Назад", callback_data="manage_projects")])
-    
-    await query.edit_message_text(
-        "📝 **Выберите проект для редактирования:**",
-        parse_mode=ParseMode.MARKDOWN,
-        reply_markup=InlineKeyboardMarkup(keyboard)
-    )
-
-
-async def show_products_for_delete(query):
-    """Show products for deletion"""
-    products = await db.products.find().to_list(1000)
-    
-    if not products:
-        await query.edit_message_text(
-            "❌ Товары не найдены",
-            reply_markup=get_back_keyboard()
-        )
-        return
-    
-    keyboard = []
-    for product in products:
-        keyboard.append([InlineKeyboardButton(
-            f"🗑️ {product['name']}", 
-            callback_data=f"delete_product_{product['id']}"
-        )])
-    keyboard.append([InlineKeyboardButton("🔙 Назад", callback_data="manage_products")])
-    
-    await query.edit_message_text(
-        "🗑️ **Выберите товар для удаления:**",
-        parse_mode=ParseMode.MARKDOWN,
-        reply_markup=InlineKeyboardMarkup(keyboard)
-    )
-
-
-async def show_projects_for_delete(query):
-    """Show projects for deletion"""
-    projects = await db.projects.find().to_list(1000)
-    
-    if not projects:
-        await query.edit_message_text(
-            "❌ Проекты не найдены",
-            reply_markup=get_back_keyboard()
-        )
-        return
-    
-    keyboard = []
-    for project in projects:
-        keyboard.append([InlineKeyboardButton(
-            f"🗑️ {project['title']}", 
-            callback_data=f"delete_project_{project['id']}"
-        )])
-    keyboard.append([InlineKeyboardButton("🔙 Назад", callback_data="manage_projects")])
-    
-    await query.edit_message_text(
-        "🗑️ **Выберите проект для удаления:**",
-        parse_mode=ParseMode.MARKDOWN,
-        reply_markup=InlineKeyboardMarkup(keyboard)
-    )
-
-
-async def delete_product(query, product_id: str):
-    """Delete a product"""
-    product = await db.products.find_one({"id": product_id})
-    if not product:
-        await query.answer("❌ Товар не найден", show_alert=True)
-        return
-    
-    await db.products.delete_one({"id": product_id})
-    await query.edit_message_text(
-        f"✅ Товар '{product['name']}' успешно удален!",
-        reply_markup=get_main_menu_keyboard()
-    )
-
-
-async def delete_project(query, project_id: str):
-    """Delete a project"""
-    project = await db.projects.find_one({"id": project_id})
-    if not project:
-        await query.answer("❌ Проект не найден", show_alert=True)
-        return
-    
-    await db.projects.delete_one({"id": project_id})
-    await query.edit_message_text(
-        f"✅ Проект '{project['title']}' успешно удален!",
-        reply_markup=get_main_menu_keyboard()
-    )
-
-
-async def show_statistics(query):
-    """Show statistics"""
-    products_count = await db.products.count_documents({})
-    projects_count = await db.projects.count_documents({})
-    orders_count = await db.orders.count_documents({})
-    feedback_count = await db.feedback.count_documents({})
-    
-    text = f"""
-📊 **Статистика**
-
-📦 Товары: {products_count}
-🏗️ Проекты: {projects_count}
-🛒 Заказы: {orders_count}
-💬 Обратная связь: {feedback_count}
-    """
-    
-    await query.edit_message_text(
-        text,
-        parse_mode=ParseMode.MARKDOWN,
-        reply_markup=get_back_keyboard()
-    )
-
-
-async def finish_project_creation(query, user_id: int):
-    """Finish creating a new project"""
+async def finish_add_project_images(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    await query.answer()
+    user_id = query.from_user.id
     project_data = admin_state.get_state(user_id).get("new_project", {})
-    
-    if not project_data.get("images"):
-        await query.edit_message_text(
-            "❌ Проект должен содержать хотя бы одно изображение!",
-            reply_markup=get_back_keyboard()
-        )
-        return
-    
-    # Generate UUID for project
-    import uuid
-    project_data["id"] = str(uuid.uuid4())
     project_data["created_at"] = datetime.utcnow()
-        # Save to database
+    project_data["id"] = str(db.projects.count_documents({}) + 1) # Simple ID generation
+    
     await db.projects.insert_one(project_data)
     admin_state.clear_state(user_id)
     await query.edit_message_text(
-        f"✅ Проект \'{project_data['title']}\' успешно добавлен!",
+        "✅ Проект успешно добавлен!",
         reply_markup=get_main_menu_keyboard()
     )
-async def finish_project_images_edit(query, user_id: int):
-    """Finish editing project images"""
-    editing_project = admin_state.get_state(user_id).get("editing_project", {})
-    new_images = admin_state.get_state(user_id).get("new_project_images", [])
-    
-    if not new_images:
-        await query.edit_message_text(
-            "❌ Не добавлено ни одного изображения!",
-            reply_markup=get_back_keyboard()
-        )
-        return
-    
-    project_id = editing_project.get("id")
-    if not project_id:
-        await query.edit_message_text(
-            "❌ Ошибка: проект не найден!",
-            reply_markup=get_back_keyboard()
-        )
-        return
-    
-    # Update project with new images
-    await db.projects.update_one(
-        {"id": project_id}, 
-        {"$set": {"images": new_images}}
-    )
-    
+
+async def finish_edit_project_images(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    await query.answer()
+    user_id = query.from_user.id
     admin_state.clear_state(user_id)
     await query.edit_message_text(
-        f"✅ Изображения проекта обновлены! Добавлено: {len(new_images)}",
+        "✅ Изображения проекта обновлены!",
         reply_markup=get_main_menu_keyboard()
     )
 
-
-async def start_product_edit(query, product_id: str):
-    """Start editing a product"""
+async def add_more_project_images(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    await query.answer()
     user_id = query.from_user.id
-    product = await db.products.find_one({"id": product_id})
-    
-    if not product:
-        await query.answer("❌ Товар не найден", show_alert=True)
+    action = admin_state.get_action(user_id)
+    if action == "add_project_images":
+        await query.edit_message_text("📷 Отправьте следующее изображение проекта:")
+    elif action.startswith("edit_project_images_"):
+        await query.edit_message_text("📷 Отправьте следующее изображение проекта:")
+
+
+async def list_products_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    await query.answer()
+    products = await db.products.find().to_list(1000)
+
+    if not products:
+        await query.edit_message_text("❌ Товары не найдены", reply_markup=get_back_keyboard())
         return
-    
-    admin_state.set_state(user_id, "editing_product", product)
-    
-    keyboard = [
-        [InlineKeyboardButton("📝 Название", callback_data=f"edit_product_name_{product_id}")],
-        [InlineKeyboardButton("📄 Краткое описание", callback_data=f"edit_product_short_desc_{product_id}")],
-        [InlineKeyboardButton("📋 Подробное описание", callback_data=f"edit_product_desc_{product_id}")],
-        [InlineKeyboardButton("💰 Цена", callback_data=f"edit_product_price_{product_id}")],
-        [InlineKeyboardButton("⚙️ Характеристики", callback_data=f"edit_product_specs_{product_id}")],
-        [InlineKeyboardButton("📷 Изображение", callback_data=f"edit_product_image_{product_id}")],
-        [InlineKeyboardButton("🔙 Назад", callback_data="edit_product")]
-    ]
-    
-    text = f"""
-📝 **Редактирование товара**
 
-**Название:** {product['name']}
-**Цена:** {product['price']:,.0f} ₽
-**Краткое описание:** {product['short_description']}
+    product_list_text = "📋 **Список товаров:**\n\n"
+    for product in products:
+        product_list_text += f"• **{product.get(\'name\', \'Не указано\')}** (ID: {product.get(\'id\', \'Не указано\')})\n"
 
-Выберите, что хотите изменить:
-    """
-    
     await query.edit_message_text(
-        text,
+        product_list_text,
         parse_mode=ParseMode.MARKDOWN,
-        reply_markup=InlineKeyboardMarkup(keyboard)
+        reply_markup=get_back_keyboard()
     )
 
+async def list_projects_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    await query.answer()
+    projects = await db.projects.find().to_list(1000)
 
-async def start_project_edit(query, project_id: str):
-    """Start editing a project"""
-    user_id = query.from_user.id
-    project = await db.projects.find_one({"id": project_id})
-    
-    if not project:
-        await query.answer("❌ Проект не найден", show_alert=True)
+    if not projects:
+        await query.edit_message_text("❌ Проекты не найдены", reply_markup=get_back_keyboard())
         return
-    
-    admin_state.set_state(user_id, "editing_project", project)
-    
-    keyboard = [
-        [InlineKeyboardButton("📝 Название", callback_data=f"edit_project_title_{project_id}")],
-        [InlineKeyboardButton("📋 Описание", callback_data=f"edit_project_desc_{project_id}")],
-        [InlineKeyboardButton("📍 Адрес", callback_data=f"edit_project_address_{project_id}")],
-        [InlineKeyboardButton("📷 Изображения", callback_data=f"edit_project_images_{project_id}")],
-        [InlineKeyboardButton("🔙 Назад", callback_data="edit_project")]
-    ]
-    
-    text = f"""
-📝 **Редактирование проекта**
 
-**Название:** {project['title']}
-**Адрес:** {project['address']}
-**Изображений:** {len(project.get('images', []))}
+    project_list_text = "📋 **Список проектов:**\n\n"
+    for project in projects:
+        project_list_text += f"• **{project.get(\'title\', \'Не указано\')}** (ID: {project.get(\'id\', \'Не указано\')})\n"
 
-Выберите, что хотите изменить:
-    """
-    
     await query.edit_message_text(
-        text,
+        project_list_text,
         parse_mode=ParseMode.MARKDOWN,
-        reply_markup=InlineKeyboardMarkup(keyboard)
+        reply_markup=get_back_keyboard()
     )
 
 
 def main():
-    """Start the bot"""
-    try:
-        application = Application.builder().token(BOT_TOKEN).build()
-        
-        # Add handlers
-        application.add_handler(CommandHandler("start", start_command))
-        application.add_handler(CommandHandler("admin", admin_command))
-        application.add_handler(CallbackQueryHandler(button_handler))
-        application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, message_handler))
-        application.add_handler(MessageHandler(filters.PHOTO, photo_handler))
-        
-        logger.info("Starting Telegram bot...")
-        
-        # Start the bot with conflict handling
-        application.run_polling(
-            allowed_updates=Update.ALL_TYPES,
-            drop_pending_updates=True,
-            timeout=30
-        )
-        
-    except Exception as e:
-        logger.error(f"Bot error: {e}")
-        # Wait and retry
-        import time
-        time.sleep(30)
-        main()
+    application = Application.builder().token(BOT_TOKEN).build()
+
+    # Commands
+    application.add_handler(CommandHandler("start", start_command))
+    application.add_handler(CommandHandler("admin", admin_command))
+
+    # Callback queries
+    application.add_handler(CallbackQueryHandler(callback_query_handler))
+
+    # Message handlers
+    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, message_handler))
+    application.add_handler(MessageHandler(filters.PHOTO, photo_handler))
+
+    # Add specific handlers for edit actions
+    application.add_handler(CallbackQueryHandler(edit_product_handler, pattern=r\'^edit_product_\w+$\' ))
+    application.add_handler(CallbackQueryHandler(edit_project_handler, pattern=r\'^edit_project_\w+$\' ))
+    application.add_handler(CallbackQueryHandler(finish_add_project_images, pattern=\'^finish_add_project_images$\' ))
+    application.add_handler(CallbackQueryHandler(finish_edit_project_images, pattern=\'^finish_edit_project_images$\' ))
+    application.add_handler(CallbackQueryHandler(add_more_project_images, pattern=\'^add_more_project_images$\' ))
+    application.add_handler(CallbackQueryHandler(list_products_handler, pattern=\'^list_products$\' ))
+    application.add_handler(CallbackQueryHandler(list_projects_handler, pattern=\'^list_projects$\' ))
+
+    # Run the bot until the user presses Ctrl-C
+    application.run_polling(allowed_updates=Update.ALL_TYPES)
 
 
 if __name__ == "__main__":
     main()
+
+

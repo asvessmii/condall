@@ -270,6 +270,19 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         project_id = data.replace("delete_project_", "")
         await delete_project(query, project_id)
     
+    elif data == "contact_info":
+        await query.edit_message_text(
+            "📞 **Контактная информация**\n\n"
+            "📱 Телефон: +7 (495) 123-45-67\n"
+            "📧 Email: info@klimattehno.ru\n"
+            "🕐 Режим работы: Пн-Пт 9:00-18:00\n\n"
+            "🌐 Или перейдите в наш каталог:",
+            parse_mode=ParseMode.MARKDOWN,
+            reply_markup=InlineKeyboardMarkup([
+                [InlineKeyboardButton("🌐 Открыть каталог", web_app=WebAppInfo(url="https://6a1c6ce0-e5c2-4452-9423-39f29c6b04b5.preview.emergentagent.com"))]
+            ])
+        )
+    
     elif data == "statistics":
         await show_statistics(query)
     

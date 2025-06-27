@@ -66,18 +66,45 @@ class DatabaseBackupTest(unittest.TestCase):
         """Insert test data into MongoDB"""
         print("\n🔍 Inserting test data for backup testing...")
         
+        # Create test data
+        test_product = {
+            "id": str(uuid.uuid4()),
+            "name": "Backup Test Product",
+            "description": "This product is used for backup testing",
+            "short_description": "Backup test",
+            "price": 555.55,
+            "image_url": "data:image/jpeg;base64,backup_test",
+            "specifications": {
+                "Backup": "Test"
+            },
+            "created_at": datetime.utcnow()
+        }
+        
+        test_project = {
+            "id": str(uuid.uuid4()),
+            "title": "Backup Test Project",
+            "description": "This project is used for backup testing",
+            "address": "Backup Test Address, 123",
+            "images": ["data:image/jpeg;base64,backup_test1", "data:image/jpeg;base64,backup_test2"],
+            "created_at": datetime.utcnow()
+        }
+        
+        # Store IDs for later use
+        self.test_product_id = test_product["id"]
+        self.test_project_id = test_project["id"]
+        
         # Create MongoDB client
         client = AsyncIOMotorClient(MONGO_URL)
         db = client[DB_NAME]
         
         try:
             # Insert test product
-            await db.products.insert_one(self.test_product)
-            print(f"✅ Test product inserted with ID: {self.test_product['id']}")
+            await db.products.insert_one(test_product)
+            print(f"✅ Test product inserted with ID: {test_product['id']}")
             
             # Insert test project
-            await db.projects.insert_one(self.test_project)
-            print(f"✅ Test project inserted with ID: {self.test_project['id']}")
+            await db.projects.insert_one(test_project)
+            print(f"✅ Test project inserted with ID: {test_project['id']}")
             
             # Count documents
             products_count = await db.products.count_documents({})

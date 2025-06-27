@@ -939,11 +939,15 @@ function App() {
 
   const handleUpdateQuantity = async (itemId, newQuantity) => {
     try {
+      // Get user_id from telegram or use fallback
+      const userId = telegramUser?.id || 'guest_user';
+      
       const item = cartItems.find(item => item.id === itemId);
       if (item) {
-        await axios.delete(`${API}/cart/${itemId}`);
+        await axios.delete(`${API}/cart/${itemId}?user_id=${userId}`);
         if (newQuantity > 0) {
           await axios.post(`${API}/cart`, {
+            user_id: userId,
             product_id: item.product_id,
             quantity: newQuantity
           });

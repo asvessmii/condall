@@ -136,7 +136,80 @@ backend:
         comment: "Тестирование подтвердило корректную работу API /api/orders с Telegram данными пользователя. Проверено: 1) API принимает запросы без Telegram данных (обратная совместимость), 2) API принимает запросы с Telegram данными (tg_user_id и tg_username), 3) Данные корректно сохраняются в MongoDB, 4) Структура данных в БД соответствует новой модели Order, 5) Корзина пользователя корректно очищается после создания заказа. Все тесты успешно пройдены."
 
 frontend:
-  - task: "Add Telegram User Data to Feedback Form Submission"
+  - task: "Fix Cart Addition Error - Improve User ID Handling"
+    implemented: true
+    working: true
+    file: "App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "ИСПРАВЛЕНО! Обнаружена и устранена проблема с получением user_id в функции getUserId(). Изменено с telegramUser?.id на telegramUser?.id?.toString() для обеспечения корректного преобразования ID в строку. Это решает проблему 'Ошибка добавления товара в корзину', которая возникала когда ID пользователя не был корректно передан в API запрос."
+
+  - task: "Update App Title from 'КЛИМАТ ТЕХНО' to 'COMFORT КЛИМАТ'"
+    implemented: true
+    working: true
+    file: "App.js, App.css"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "ВЫПОЛНЕНО! Обновлен заголовок приложения с 'КЛИМАТ ТЕХНО' на 'COMFORT КЛИМАТ'. Добавлен красивый стиль заголовка: импортирован шрифт Montserrat, применен градиентный цвет (синие оттенки), добавлен эффект свечения для иконки снежинки, увеличен размер шрифта и добавлена анимация."
+
+  - task: "Add URL Hash Navigation Support"
+    implemented: true
+    working: true
+    file: "App.js"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "ДОБАВЛЕНО! Реализована поддержка навигации через URL hash (#feedback, #catalog, etc.). Теперь при переходе по ссылке с якорем приложение автоматически открывает соответствующую вкладку."
+
+  - task: "Remove Contact Information from Feedback Section"
+    implemented: true
+    working: true
+    file: "App.js"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "ВЫПОЛНЕНО! Удалена контактная информация (телефон +7 (495) 123-45-67 и email info@klimattehno.ru) из вкладки 'Связь'. Теперь в разделе остается только форма для связи без дополнительной контактной информации."
+
+backend:
+  - task: "Update Telegram Bot Welcome Messages"
+    implemented: true
+    working: true
+    file: "telegram_admin.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "ОБНОВЛЕНО! Изменены приветственные сообщения в Telegram боте: 1) Обычное приветствие изменено с 'Добро пожаловать в КЛИМАТ ТЕХНО' на 'Добро пожаловать в COMFORT КЛИМАТ', 2) Админ-панель изменена с 'Админ панель КЛИМАТ ТЕХНО' на 'Админ панель COMFORT КЛИМАТ'."
+
+  - task: "Update 'Contact Us' Button Behavior"
+    implemented: true
+    working: true
+    file: "telegram_admin.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "ИЗМЕНЕНО! Кнопка 'Связаться с нами' в Telegram боте теперь открывает веб-приложение напрямую во вкладку 'Связь' (через WebApp с URL #feedback) вместо показа контактной информации. Удален обработчик callback'а contact_info, так как он больше не нужен."
+
+  - task: "Add Telegram User Info to Feedback Notifications"
     implemented: true
     working: true
     file: "App.js"

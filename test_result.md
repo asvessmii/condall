@@ -270,7 +270,7 @@ frontend:
 metadata:
   created_by: "main_agent"
   version: "2.0"
-  test_sequence: 3
+  test_sequence: 4
   run_ui: false
 
 test_plan:
@@ -279,35 +279,7 @@ test_plan:
   test_all: false
   test_priority: "high_first"
 
-  - task: "Telegram Bot Command Changes (/start and /admin)"
-    implemented: true
-    working: true
-    file: "telegram_admin.py"
-    stuck_count: 0
-    priority: "high"
-    needs_retesting: false
-    status_history:
-      - working: "NA"
-        agent: "main"
-        comment: "Changed command access to admin panel from /start to /admin. Now /start shows welcome message for regular users with catalog access, and /admin gives access to admin panel for administrator (ID: 7470811680)."
-      - working: true
-        agent: "testing"
-        comment: "Tested the command changes. Confirmed that /start now shows welcome message for regular users with 'Открыть каталог' button, and /admin gives access to admin panel for administrator (ID: 7470811680). Admin authentication works correctly - only user with ID 7470811680 can access admin panel. The bot is running as a supervisor service with auto-restart enabled."
-
-  - task: "Telegram Bot Contact Button"
-    implemented: true
-    working: true
-    file: "telegram_admin.py"
-    stuck_count: 0
-    priority: "medium"
-    needs_retesting: false
-    status_history:
-      - working: "NA"
-        agent: "main"
-        comment: "Added 'Связаться с нами' button for regular users in the /start command response. Button shows contact information when clicked."
-      - working: true
-        agent: "testing"
-        comment: "Tested the 'Связаться с нами' button functionality. Button is correctly displayed in the /start command response and shows contact information (phone, email, working hours) when clicked. The button also provides a link back to the catalog."
+agent_communication:
   - agent: "testing"
     message: "Completed testing of the Telegram Bot Admin Panel implementation. All tests passed successfully. The bot initializes correctly, authenticates admin users properly (only ID 7470811680 has access), and provides full CRUD operations for both products and projects. The main menu navigation works as expected, and all required dependencies are installed. The bot correctly handles image uploads and converts them to base64 format. All functionality is working as expected with no critical issues found."
   - agent: "user"
@@ -340,3 +312,5 @@ test_plan:
     message: "Проведено дополнительное тестирование изоляции корзин пользователей через UI. Результаты: 1) Подтверждено, что корзины пользователей изолированы - при переключении между разными user_id корзины отображаются корректно, 2) Все запросы к API корзины содержат user_id в параметрах (GET, POST), 3) Уведомления при добавлении товаров в корзину работают корректно, 4) Все операции с корзиной (добавление, изменение количества, удаление) функционируют правильно, 5) Обнаружена проблема с сохранением состояния корзины при переключении между пользователями - при возврате к первому пользователю его корзина может быть пустой. Рекомендуется проверить механизм кэширования данных корзины на клиенте."
   - agent: "testing"
     message: "Проведено тестирование изменений в Telegram боте для админ-панели интернет-магазина кондиционеров. Результаты: 1) Команда /start теперь корректно показывает приветствие для обычных пользователей с кнопкой 'Открыть каталог', 2) Добавлена и работает кнопка 'Связаться с нами', которая показывает контактную информацию, 3) Команда /admin теперь дает доступ к админ-панели только для администратора с ID 7470811680, 4) Проверка доступа работает корректно - неавторизованные пользователи не могут получить доступ к админ-панели, 5) Telegram бот работает стабильно как supervisor сервис с настроенным автоматическим перезапуском. Все тесты прошли успешно, изменения реализованы корректно."
+  - agent: "testing"
+    message: "Проведено тестирование системы резервного копирования и восстановления базы данных. Результаты: 1) GET /api/backup/status корректно возвращает информацию о состоянии базы данных и резервных копиях, 2) POST /api/backup/create успешно создает резервные копии всех коллекций (products, projects, orders, feedback) в формате JSON, 3) POST /api/backup/restore успешно восстанавливает базу данных из резервных копий, 4) Файлы резервных копий сохраняются в правильном месте (/app/backend/data) и содержат корректные данные в формате JSON, 5) Метаданные резервных копий правильно сохраняются в файле backup_info.json с информацией о времени создания. Система резервного копирования работает корректно и позволяет пользователям сохранять данные в JSON-файлы и восстанавливать их после переустановки приложения."

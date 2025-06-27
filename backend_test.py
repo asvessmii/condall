@@ -321,13 +321,9 @@ class TelegramBotAdminPanelTest(unittest.TestCase):
         
         print("✅ Main menu keyboard is correctly structured")
 
-    @patch('telegram_admin.check_admin')
-    async def test_04_start_command(self, mock_check_admin):
-        """Test start command handler"""
-        print("\n🔍 Testing start command handler...")
-        
-        # Mock check_admin to return True
-        mock_check_admin.return_value = True
+    async def test_04_start_command_for_regular_users(self):
+        """Test start command handler for regular users"""
+        print("\n🔍 Testing start command handler for regular users...")
         
         # Call start_command
         await self.telegram_admin.start_command(self.mock_update, self.mock_context)
@@ -335,9 +331,61 @@ class TelegramBotAdminPanelTest(unittest.TestCase):
         # Check if welcome message was sent
         self.mock_message.reply_text.assert_called()
         call_args = self.mock_message.reply_text.call_args[0][0]
+        self.assertIn("Добро пожаловать в КЛИМАТ ТЕХНО", call_args)
+        
+        # Check if the keyboard has the correct buttons
+        reply_markup = self.mock_message.reply_text.call_args[1]['reply_markup']
+        self.assertEqual(len(reply_markup.inline_keyboard), 2)
+        self.assertEqual(reply_markup.inline_keyboard[0][0].text, "🌐 Открыть каталог")
+        self.assertEqual(reply_markup.inline_keyboard[1][0].text, "📞 Связаться с нами")
+        self.assertEqual(reply_markup.inline_keyboard[1][0].callback_data, "contact_info")
+        
+        print("✅ Start command shows welcome message with catalog button and contact button for regular users")
+        
+    @patch('telegram_admin.check_admin')
+    async def test_05_admin_command_for_admin(self, mock_check_admin):
+        """Test admin command handler for admin user"""
+        print("\n🔍 Testing admin command handler for admin user...")
+        
+        # Mock check_admin to return True
+        mock_check_admin.return_value = True
+        
+        # Call admin_command
+        await self.telegram_admin.admin_command(self.mock_update, self.mock_context)
+        
+        # Check if admin panel message was sent
+        self.mock_message.reply_text.assert_called()
+        call_args = self.mock_message.reply_text.call_args[0][0]
         self.assertIn("Админ панель КЛИМАТ ТЕХНО", call_args)
         
-        print("✅ Start command sends welcome message with main menu")
+        # Check if the keyboard has the correct buttons
+        reply_markup = self.mock_message.reply_text.call_args[1]['reply_markup']
+        self.assertEqual(len(reply_markup.inline_keyboard), 5)  # 5 buttons in admin panel
+        self.assertEqual(reply_markup.inline_keyboard[1][0].text, "📦 Управление товарами")
+        self.assertEqual(reply_markup.inline_keyboard[2][0].text, "🏗️ Управление проектами")
+        
+        print("✅ Admin command shows admin panel with management options for admin user")
+    
+    @patch('telegram_admin.check_admin')
+    async def test_06_admin_command_for_non_admin(self, mock_check_admin):
+        """Test admin command handler for non-admin user"""
+        print("\n🔍 Testing admin command handler for non-admin user...")
+        
+        # Mock check_admin to return False
+        mock_check_admin.return_value = False
+        
+        # Set up non-admin user
+        self.mock_update.effective_user = self.non_admin_user
+        
+        # Call admin_command
+        await self.telegram_admin.admin_command(self.mock_update, self.mock_context)
+        
+        # Check if access denied message was sent
+        self.mock_message.reply_text.assert_called()
+        call_args = self.mock_message.reply_text.call_args[0][0]
+        self.assertIn("У вас нет прав доступа к админ панели", call_args)
+        
+        print("✅ Admin command blocks access for non-admin users")
 
     @patch('telegram_admin.check_admin_callback')
     async def test_05_button_handler_main_menu(self, mock_check_admin_callback):

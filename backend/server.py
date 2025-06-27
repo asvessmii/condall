@@ -15,7 +15,19 @@ import json
 from pathlib import Path
 
 # Импорт класса для работы с резервными копиями
-from database_backup import DatabaseBackup
+try:
+    from backend.database_backup import DatabaseBackup
+except ImportError:
+    try:
+        from .database_backup import DatabaseBackup
+    except ImportError:
+        try:
+            import sys
+            import os
+            sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+            from database_backup import DatabaseBackup
+        except ImportError:
+            DatabaseBackup = None
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')

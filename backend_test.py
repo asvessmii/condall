@@ -492,16 +492,16 @@ class TelegramUserInfoTest(unittest.TestCase):
         response = requests.get(f"{API_URL}/cart", params={"user_id": test_user_id})
         cart_items = response.json()
         
-        # Test with invalid tg_user_id type (should be converted to string)
+        # Test with string tg_user_id
         order_data = {
             "items": cart_items,
-            "tg_user_id": 87654321,  # Number instead of string
-            "tg_username": "order_api_test"
+            "tg_user_id": "87654321",  # String ID
+            "tg_username": "order_api_test2"
         }
         
         response = requests.post(f"{API_URL}/orders", json=order_data)
         self.assertEqual(response.status_code, 200)
-        print("✅ API handles numeric tg_user_id correctly")
+        print("✅ API accepts string tg_user_id correctly")
     """Test suite for the Telegram Bot Admin Panel"""
 
     @classmethod

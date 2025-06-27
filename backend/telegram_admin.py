@@ -99,6 +99,33 @@ def get_main_menu_keyboard():
     ]
     return InlineKeyboardMarkup(keyboard)
 
+def get_products_menu_keyboard():
+    """Get products management menu keyboard"""
+    keyboard = [
+        [InlineKeyboardButton("➕ Добавить товар", callback_data="add_product")],
+        [InlineKeyboardButton("📝 Редактировать товар", callback_data="edit_product")],
+        [InlineKeyboardButton("🗑️ Удалить товар", callback_data="delete_product")],
+        [InlineKeyboardButton("🔙 Назад", callback_data="main_menu")]
+    ]
+    return InlineKeyboardMarkup(keyboard)
+
+def get_projects_menu_keyboard():
+    """Get projects management menu keyboard"""
+    keyboard = [
+        [InlineKeyboardButton("➕ Добавить проект", callback_data="add_project")],
+        [InlineKeyboardButton("📝 Редактировать проект", callback_data="edit_project")],
+        [InlineKeyboardButton("🗑️ Удалить проект", callback_data="delete_project")],
+        [InlineKeyboardButton("🔙 Назад", callback_data="main_menu")]
+    ]
+    return InlineKeyboardMarkup(keyboard)
+
+def get_back_keyboard():
+    """Get back to main menu keyboard"""
+    keyboard = [
+        [InlineKeyboardButton("🔙 Главное меню", callback_data="main_menu")]
+    ]
+    return InlineKeyboardMarkup(keyboard)
+
 
 def get_products_menu_keyboard():
     """Get products management keyboard"""

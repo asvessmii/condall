@@ -142,11 +142,14 @@ frontend:
     file: "App.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "РЕАЛИЗОВАНА! Обновлен компонент Feedback для автоматического получения Telegram данных пользователя (ID и username) и передачи их при отправке формы обратной связи. Данные получаются через getTelegramUser() и добавляются в submitData."
+      - working: true
+        agent: "testing"
+        comment: "Тестирование подтвердило корректную работу функциональности. Форма обратной связи успешно отправляется, и данные Telegram пользователя (tg_user_id и tg_username) передаются в запросе. После отправки форма корректно очищается. Функциональность полностью работоспособна."
 
   - task: "Add Automatic Phone Number Formatting"
     implemented: true
@@ -154,11 +157,14 @@ frontend:
     file: "App.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "РЕАЛИЗОВАНА! Добавлено автоматическое форматирование номера телефона в форме обратной связи. Реализована функция formatPhoneNumber для автоматической вставки '+7(' в начале и ограничения ввода до 10 цифр после префикса. Добавлена функция handlePhoneChange для обработки изменений поля телефона с валидацией и форматированием."
+      - working: true
+        agent: "testing"
+        comment: "Тестирование подтвердило корректную работу автоформатирования номера телефона. Проверено: 1) При клике в поле автоматически появляется '+7(', 2) При вводе цифр номер форматируется как '+7(XXX) XXX-XX-XX', 3) Ввод ограничен 10 цифрами после префикса, 4) При попытке удалить префикс '+7(' он автоматически восстанавливается. Функциональность полностью соответствует требованиям."
 
   - task: "Add Telegram User Data to Order Submission"
     implemented: true
@@ -166,11 +172,14 @@ frontend:
     file: "App.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "РЕАЛИЗОВАНА! Обновлена функция handleOrder для автоматического получения Telegram данных пользователя (ID и username) и передачи их при создании заказа. Данные получаются через getTelegramUser() и добавляются в orderData."
+      - working: true
+        agent: "testing"
+        comment: "Тестирование подтвердило корректную работу функциональности. Процесс оформления заказа работает без ошибок: товары добавляются в корзину, заказ успешно оформляется, и данные Telegram пользователя (tg_user_id и tg_username) передаются в запросе. После оформления заказа корзина корректно очищается. Функциональность полностью работоспособна."
 
 backend:
   - task: "Fix Shared Cart Issue - Implement User-Specific Cart Isolation"

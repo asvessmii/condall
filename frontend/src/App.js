@@ -949,6 +949,8 @@ function App() {
   const [showPromoPopup, setShowPromoPopup] = useState(false);
   const [promotionsCount, setPromotionsCount] = useState(0);
   const [popupAnimationClass, setPopupAnimationClass] = useState('');
+  const [promotionView, setPromotionView] = useState('list'); // 'list' or 'details'  
+  const [shouldAutoFillPromo, setShouldAutoFillPromo] = useState(false);
 
   // Helper function to get user ID with fallback
   const getUserId = () => {

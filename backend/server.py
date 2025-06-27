@@ -60,6 +60,7 @@ class ProductCreate(BaseModel):
 
 class CartItem(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str  # Telegram user ID for cart isolation
     product_id: str
     product_name: str
     price: float
@@ -67,6 +68,7 @@ class CartItem(BaseModel):
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
 class CartItemCreate(BaseModel):
+    user_id: str  # Telegram user ID for cart isolation
     product_id: str
     quantity: int = 1
 

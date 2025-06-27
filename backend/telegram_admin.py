@@ -392,7 +392,7 @@ async def message_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     if not action:
         await update.message.reply_text(
-            "Используйте /start для открытия админ панели",
+            "Используйте /admin для открытия админ панели",
             reply_markup=get_back_keyboard()
         )
         return

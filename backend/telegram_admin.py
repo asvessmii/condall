@@ -176,7 +176,7 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     keyboard = [
         [InlineKeyboardButton("🌐 Открыть каталог", web_app=WebAppInfo(url="https://903ba11b-f75f-4086-ab31-d862cb0adabe.preview.emergentagent.com"))],
-        [InlineKeyboardButton("📞 Связаться с нами", callback_data="contact_info")]
+        [InlineKeyboardButton("📞 Связаться с нами", web_app=WebAppInfo(url="https://903ba11b-f75f-4086-ab31-d862cb0adabe.preview.emergentagent.com#feedback"))]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     

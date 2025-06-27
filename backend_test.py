@@ -729,30 +729,25 @@ class TelegramBotAdminPanelTest(unittest.TestCase):
         
         print("✅ Show statistics functionality works correctly")
 
-    def test_17_dependencies_installed(self):
-        """Test that required dependencies are installed"""
-        print("\n🔍 Testing required dependencies...")
+    def test_18_telegram_bot_running_as_service(self):
+        """Test that Telegram bot is running as a supervisor service"""
+        print("\n🔍 Testing Telegram bot supervisor service...")
         
-        # Check for python-telegram-bot
-        try:
-            import telegram
-            print(f"✅ python-telegram-bot is installed")
-        except ImportError:
-            self.fail("python-telegram-bot is not installed")
+        # Check if telegram_bot service is running
+        import subprocess
+        result = subprocess.run(["sudo", "supervisorctl", "status", "telegram_bot"], 
+                               capture_output=True, text=True)
         
-        # Check for Pillow
-        try:
-            import PIL
-            print(f"✅ Pillow is installed")
-        except ImportError:
-            self.fail("Pillow is not installed")
+        # Check if the service is running
+        self.assertIn("RUNNING", result.stdout)
+        print(f"✅ Telegram bot is running as a supervisor service: {result.stdout.strip()}")
         
-        # Check for motor (MongoDB driver)
-        try:
-            import motor
-            print(f"✅ motor is installed")
-        except ImportError:
-            self.fail("motor is not installed")
+        # Check if the service is configured to auto-restart
+        config_result = subprocess.run(["cat", "/etc/supervisor/conf.d/supervisord.conf"], 
+                                      capture_output=True, text=True)
+        self.assertIn("program:telegram_bot", config_result.stdout)
+        self.assertIn("autorestart=true", config_result.stdout)
+        print("✅ Telegram bot is configured to auto-restart")
 
 class MongoDBPersistenceTest(unittest.TestCase):
     """Test suite for MongoDB persistence"""

@@ -975,6 +975,32 @@ function App() {
     }
   }, [telegramUser]);
 
+  // Show promotion popup on app load
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowPromoPopup(true);
+      setPopupAnimationClass('popup-enter');
+      
+      // Hide popup after 5 seconds with animation
+      const hideTimer = setTimeout(() => {
+        setPopupAnimationClass('popup-exit');
+        
+        // Complete hide and show badge after animation
+        const completeTimer = setTimeout(() => {
+          setShowPromoPopup(false);
+          setPromotionsCount(1);
+          setPopupAnimationClass('');
+        }, 500); // Animation duration
+        
+        return () => clearTimeout(completeTimer);
+      }, 5000); // Show for 5 seconds
+      
+      return () => clearTimeout(hideTimer);
+    }, 1000); // Show popup 1 second after app load
+    
+    return () => clearTimeout(timer);
+  }, []);
+
   const initializeData = async () => {
     // Функция отключена - данные инициализируются вручную
     console.log('Автоматическая инициализация данных отключена');

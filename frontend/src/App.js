@@ -611,6 +611,27 @@ const About = () => {
   );
 };
 
+// Promotions Section
+const Promotions = () => {
+  return (
+    <div className="section">
+      <div className="section-content">
+        <div className="promotions-content">
+          <div className="promotions-header">
+            <h2 className="promotions-title">🎁 Актуальные акции</h2>
+            <p className="promotions-subtitle">Скоро здесь появятся выгодные предложения!</p>
+          </div>
+          <div className="empty-promotions">
+            <div className="empty-promotions-icon">🎯</div>
+            <h3 className="empty-promotions-title">Готовим специальные предложения</h3>
+            <p className="empty-promotions-text">Следите за обновлениями, чтобы не пропустить лучшие акции на климатическое оборудование</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 // Feedback Section
 const Feedback = () => {
   const [formData, setFormData] = useState({

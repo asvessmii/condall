@@ -227,6 +227,17 @@ backend:
         comment: "Comprehensive testing of product CRUD operations completed. Findings: 1) GET /api/products works correctly, returning all products. 2) POST /api/products successfully adds new products with unique IDs. 3) DELETE /api/products/{product_id} works correctly, removing products from the database. 4) Data persistence is working - products remain after backend service restart. 5) Found duplicate product names in the database, but all have unique IDs. 6) The system allows adding products with identical names, which could lead to confusion. Consider implementing uniqueness constraints or upsert functionality."
 
 frontend:
+  - task: "Update Frontend Cart Functions for User-Specific Cart Isolation"
+    implemented: true
+    working: "NA"
+    file: "App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "ИСПРАВЛЕНО! Frontend обновлен для поддержки пользовательских корзин. Выполнено: 1) Добавлена функция getUserId() для получения Telegram user ID с fallback на 'guest_user', 2) Обновлены все функции корзины (fetchCartItems, handleAddToCart, handleRemoveFromCart, handleUpdateQuantity, handleClearCart) для передачи user_id в запросах, 3) Изменена логика инициализации - корзина загружается после инициализации telegramUser, 4) Все запросы к API корзины теперь включают user_id для изоляции данных пользователей."
   - task: "Frontend Integration (No changes needed)"
     implemented: true
     working: true

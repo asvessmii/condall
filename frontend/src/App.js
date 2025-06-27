@@ -890,7 +890,11 @@ function App() {
 
   const handleAddToCart = async (product) => {
     try {
+      // Get user_id from telegram or use fallback
+      const userId = telegramUser?.id || 'guest_user';
+      
       await axios.post(`${API}/cart`, {
+        user_id: userId,
         product_id: product.id,
         quantity: 1
       });

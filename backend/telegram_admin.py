@@ -91,7 +91,7 @@ async def check_admin(update: Update) -> bool:
 def get_main_menu_keyboard():
     """Get main menu keyboard"""
     keyboard = [
-        [InlineKeyboardButton("🌐 Открыть сайт", web_app=WebAppInfo(url="https://d54fb900-959c-4e78-9271-9ba6b0e44647.preview.emergentagent.com"))],
+        [InlineKeyboardButton("🌐 Открыть сайт", web_app=WebAppInfo(url="https://ae1be814-86a8-453d-a4c8-928d1c88a8e1.preview.emergentagent.com"))],
         [InlineKeyboardButton("📦 Управление товарами", callback_data="manage_products")],
         [InlineKeyboardButton("🏗️ Управление проектами", callback_data="manage_projects")],
         [InlineKeyboardButton("💾 Резервные копии", callback_data="backup_menu")],
@@ -148,7 +148,7 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """
     
     keyboard = [
-        [InlineKeyboardButton("🌐 Открыть каталог", web_app=WebAppInfo(url="https://d54fb900-959c-4e78-9271-9ba6b0e44647.preview.emergentagent.com"))],
+        [InlineKeyboardButton("🌐 Открыть каталог", web_app=WebAppInfo(url="https://ae1be814-86a8-453d-a4c8-928d1c88a8e1.preview.emergentagent.com"))],
         [InlineKeyboardButton("📞 Связаться с нами", callback_data="contact_info")]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
@@ -279,7 +279,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "🌐 Или перейдите в наш каталог:",
             parse_mode=ParseMode.MARKDOWN,
             reply_markup=InlineKeyboardMarkup([
-                [InlineKeyboardButton("🌐 Открыть каталог", web_app=WebAppInfo(url="https://d54fb900-959c-4e78-9271-9ba6b0e44647.preview.emergentagent.com"))]
+                [InlineKeyboardButton("🌐 Открыть каталог", web_app=WebAppInfo(url="https://ae1be814-86a8-453d-a4c8-928d1c88a8e1.preview.emergentagent.com"))]
             ])
         )
     

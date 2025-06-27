@@ -961,7 +961,9 @@ function App() {
 
   const handleClearCart = async () => {
     try {
-      await axios.delete(`${API}/cart`);
+      // Get user_id from telegram or use fallback
+      const userId = telegramUser?.id || 'guest_user';
+      await axios.delete(`${API}/cart?user_id=${userId}`);
       setCartItems([]);
     } catch (error) {
       console.error('Ошибка очистки корзины:', error);

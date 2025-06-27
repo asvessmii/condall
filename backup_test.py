@@ -277,8 +277,8 @@ class DatabaseBackupTest(unittest.TestCase):
             await self.clean_test_data()
             
             # Verify test data is gone
-            product = await db.products.find_one({"id": self.test_product["id"]})
-            project = await db.projects.find_one({"id": self.test_project["id"]})
+            product = await db.products.find_one({"id": self.test_product_id})
+            project = await db.projects.find_one({"id": self.test_project_id})
             
             self.assertIsNone(product, "Test product still exists after cleanup")
             self.assertIsNone(project, "Test project still exists after cleanup")
@@ -305,8 +305,8 @@ class DatabaseBackupTest(unittest.TestCase):
             time.sleep(2)
             
             # Verify test data is restored
-            product = await db.products.find_one({"id": self.test_product["id"]})
-            project = await db.projects.find_one({"id": self.test_project["id"]})
+            product = await db.products.find_one({"id": self.test_product_id})
+            project = await db.projects.find_one({"id": self.test_project_id})
             
             self.assertIsNotNone(product, "Test product was not restored")
             self.assertIsNotNone(project, "Test project was not restored")

@@ -1088,6 +1088,13 @@ function App() {
     }
   }, [activeSection, promotionsCount]);
 
+  // Reset promotion view when leaving promotions section
+  useEffect(() => {
+    if (activeSection !== 'promotions') {
+      setPromotionView('list');
+    }
+  }, [activeSection]);
+
   const initializeData = async () => {
     // Функция отключена - данные инициализируются вручную
     console.log('Автоматическая инициализация данных отключена');

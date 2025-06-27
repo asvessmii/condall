@@ -321,12 +321,12 @@ class TelegramBotAdminPanelTest(unittest.TestCase):
         
         print("✅ Main menu keyboard is correctly structured")
 
-    async def test_04_start_command_for_regular_users(self):
+    def test_04_start_command_for_regular_users(self):
         """Test start command handler for regular users"""
         print("\n🔍 Testing start command handler for regular users...")
         
         # Call start_command
-        await self.telegram_admin.start_command(self.mock_update, self.mock_context)
+        asyncio.run(self.telegram_admin.start_command(self.mock_update, self.mock_context))
         
         # Check if welcome message was sent
         self.mock_message.reply_text.assert_called()

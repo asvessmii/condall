@@ -188,20 +188,23 @@ async def admin_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Handle button callbacks"""
+    """Handle button clicks"""
     query = update.callback_query
     await query.answer()
-    
-    if not await check_admin_callback(query):
-        return
     
     user_id = query.from_user.id
     data = query.data
     
+    # Check admin access for admin functions
+    if data != "main_menu" and data != "open_catalog" and data != "contact_us":
+        if user_id != ADMIN_ID:
+            await query.answer("❌ У вас нет прав доступа", show_alert=True)
+            return
+    
+    # Main menu navigation
     if data == "main_menu":
-        admin_state.clear_state(user_id)
         await query.edit_message_text(
-            "🔧 **Админ панель КЛИМАТ ТЕХНО**\n\nВыберите действие:",
+            "🏠 **Главное меню администратора**\n\nВыберите действие:",
             parse_mode=ParseMode.MARKDOWN,
             reply_markup=get_main_menu_keyboard()
         )

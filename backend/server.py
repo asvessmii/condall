@@ -292,7 +292,7 @@ async def init_sample_data():
             # Проверяем, есть ли резервная копия
             backup_dir = Path(__file__).parent / 'data'
             if (backup_dir / 'products.json').exists():
-                logger.info("Найдена резервная копия, восстанавливаем данные...")
+                logging.info("Найдена резервная копия, восстанавливаем данные...")
                 success = await backup.restore_backup()
                 if success:
                     products_count = await db.products.count_documents({})

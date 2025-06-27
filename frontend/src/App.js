@@ -1132,7 +1132,7 @@ function App() {
           <div className="promo-popup-content">
             <div className="promo-popup-icon">🎁</div>
             <div className="promo-popup-text">
-              <strong>Кондиционер Haier + монтаж = 40.990₽*</strong>
+              <strong>Кондиционер HISENSE + монтаж = 40.990₽*</strong>
             </div>
           </div>
         </div>

@@ -124,12 +124,12 @@ class DatabaseBackupTest(unittest.TestCase):
         
         try:
             # Delete test product
-            await db.products.delete_one({"id": self.test_product['id']})
-            print(f"✅ Test product deleted with ID: {self.test_product['id']}")
+            await db.products.delete_one({"id": self.test_product_id})
+            print(f"✅ Test product deleted with ID: {self.test_product_id}")
             
             # Delete test project
-            await db.projects.delete_one({"id": self.test_project['id']})
-            print(f"✅ Test project deleted with ID: {self.test_project['id']}")
+            await db.projects.delete_one({"id": self.test_project_id})
+            print(f"✅ Test project deleted with ID: {self.test_project_id}")
             
             # Count documents
             products_count = await db.products.count_documents({})

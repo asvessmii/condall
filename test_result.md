@@ -234,7 +234,8 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Product CRUD Operations via API"
+    - "Telegram Bot Command Changes (/start and /admin)"
+    - "Telegram Bot Contact Button"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"

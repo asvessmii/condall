@@ -857,17 +857,6 @@ const Feedback = ({ shouldAutoFillPromo, setShouldAutoFillPromo }) => {
               {isSubmitting ? 'Отправляем...' : 'Отправить заявку'}
             </button>
           </form>
-          
-          <div className="contact-info">
-            <div className="contact-item">
-              <span className="contact-icon">📞</span>
-              <span>+7 (495) 123-45-67</span>
-            </div>
-            <div className="contact-item">
-              <span className="contact-icon">📧</span>
-              <span>info@klimattehno.ru</span>
-            </div>
-          </div>
         </div>
       </div>
     </div>

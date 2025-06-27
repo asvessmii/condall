@@ -144,9 +144,9 @@ class AirConditionerShopAPITest(unittest.TestCase):
         self.assertEqual(len(cart_items), 0)
         print("✅ Cart is empty after removal")
 
-    def test_06_feedback_submission(self):
-        """Test feedback form submission"""
-        print("\n🔍 Testing feedback submission...")
+    def test_06a_feedback_submission_without_tg_data(self):
+        """Test feedback form submission without Telegram data"""
+        print("\n🔍 Testing feedback submission without Telegram data...")
         feedback_data = {
             "name": "Тестовый Пользователь",
             "phone": "+7 (999) 123-45-67",
@@ -157,7 +157,37 @@ class AirConditionerShopAPITest(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         data = response.json()
         self.assertIn("message", data)
-        print(f"✅ Feedback submitted successfully: {data['message']}")
+        print(f"✅ Feedback submitted successfully without Telegram data: {data['message']}")
+        
+    def test_06b_feedback_submission_with_tg_data(self):
+        """Test feedback form submission with Telegram data"""
+        print("\n🔍 Testing feedback submission with Telegram data...")
+        feedback_data = {
+            "name": "Тестовый Пользователь",
+            "phone": "+7 (999) 123-45-67",
+            "message": "Это тестовое сообщение для проверки формы обратной связи.",
+            "tg_user_id": "12345678",
+            "tg_username": "test_user"
+        }
+        
+        response = requests.post(f"{API_URL}/feedback", json=feedback_data)
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertIn("message", data)
+        print(f"✅ Feedback submitted successfully with Telegram data: {data['message']}")
+        
+        # Verify data was saved to MongoDB
+        client = AsyncIOMotorClient(MONGO_URL)
+        db = client[DB_NAME]
+        
+        # Run in event loop to use async functions
+        loop = asyncio.get_event_loop()
+        feedback = loop.run_until_complete(db.feedback.find_one({"tg_user_id": "12345678"}))
+        
+        self.assertIsNotNone(feedback)
+        self.assertEqual(feedback["tg_user_id"], "12345678")
+        self.assertEqual(feedback["tg_username"], "test_user")
+        print("✅ Verified Telegram data was saved to MongoDB")
 
     def test_07_projects(self):
         """Test projects endpoint"""

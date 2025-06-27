@@ -351,12 +351,7 @@ metadata:
   run_ui: false
 
 test_plan:
-  current_focus:
-    - "Add Telegram User Info to Feedback Notifications"
-    - "Add Telegram User Info to Order Notifications"
-    - "Add Telegram User Data to Feedback Form Submission"
-    - "Add Automatic Phone Number Formatting"
-    - "Add Telegram User Data to Order Submission"
+  current_focus: []
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"

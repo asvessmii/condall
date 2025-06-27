@@ -852,6 +852,11 @@ function App() {
   const [telegramWebApp, setTelegramWebApp] = useState(null);
   const [telegramUser, setTelegramUser] = useState(null);
 
+  // Helper function to get user ID with fallback
+  const getUserId = () => {
+    return telegramUser?.id || 'guest_user';
+  };
+
   useEffect(() => {
     // Initialize Telegram Web App
     const tg = initTelegramWebApp();

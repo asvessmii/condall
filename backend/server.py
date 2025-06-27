@@ -238,13 +238,20 @@ async def submit_feedback(feedback_data: FeedbackFormCreate):
     feedback = FeedbackForm(**feedback_data.dict())
     await db.feedback.insert_one(feedback.dict())
     
+    # Build user info for message
+    user_info = ""
+    if feedback.tg_user_id:
+        user_info += f"\n🆔 <b>Telegram ID:</b> {feedback.tg_user_id}"
+    if feedback.tg_username:
+        user_info += f"\n👤 <b>Username:</b> @{feedback.tg_username}"
+    
     # Send to Telegram
     message = f"""
 🔔 <b>Новая заявка с сайта</b>
 
 👤 <b>Имя:</b> {feedback.name}
 📞 <b>Телефон:</b> {feedback.phone}
-💬 <b>Сообщение:</b> {feedback.message}
+💬 <b>Сообщение:</b> {feedback.message}{user_info}
 
 🕐 <b>Время:</b> {feedback.created_at.strftime('%d.%m.%Y %H:%M')}
 """

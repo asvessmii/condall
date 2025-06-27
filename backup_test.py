@@ -182,7 +182,7 @@ class DatabaseBackupTest(unittest.TestCase):
         
         # Get initial backup status
         initial_status = requests.get(f"{API_URL}/backup/status").json()
-        print(f"✅ Initial backup status: {initial_status['backup_available']}")
+        print(f"✅ Initial backup status: {json.dumps(initial_status, indent=2)}")
         
         # Create backup
         response = requests.post(f"{API_URL}/backup/create")
@@ -200,17 +200,17 @@ class DatabaseBackupTest(unittest.TestCase):
         
         # Verify backup files were created
         backup_status = requests.get(f"{API_URL}/backup/status").json()
-        print(f"✅ Backup status after backup: {backup_status['backup_available']}")
+        print(f"✅ Backup status after backup: {json.dumps(backup_status, indent=2)}")
         
         # Check if backup files exist
-        backup_files = backup_status["backup_files"]
+        backup_files = backup_status.get("backup_files", {})
         self.assertTrue(any(backup_files.values()), "No backup files were created")
         
         # Check if products backup file exists
-        self.assertTrue(backup_files["products"], "Products backup file was not created")
+        self.assertTrue(backup_files.get("products", False), "Products backup file was not created")
         
         # Check if projects backup file exists
-        self.assertTrue(backup_files["projects"], "Projects backup file was not created")
+        self.assertTrue(backup_files.get("projects", False), "Projects backup file was not created")
         
         print("✅ Backup files were created successfully")
         

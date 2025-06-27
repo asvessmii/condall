@@ -890,8 +890,7 @@ function App() {
 
   const fetchCartItems = async () => {
     try {
-      // Get user_id from telegram or use fallback
-      const userId = telegramUser?.id || 'guest_user';
+      const userId = getUserId();
       const response = await axios.get(`${API}/cart?user_id=${userId}`);
       setCartItems(response.data);
     } catch (error) {

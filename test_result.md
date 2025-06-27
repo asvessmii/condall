@@ -102,7 +102,69 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Мне нужно протестировать функциональность добавления и удаления товаров в системе интернет-магазина кондиционеров. НОВАЯ ПРОБЛЕМА: каким-то образом я заметил, что корзина в моём приложении 'общая' - то есть, когда я добавил товар с одного устройства, а затем зашел в это же приложение с другого - то у меня уже лежал товар в корзине, который я добавил с прошлого устройства."
+user_problem_statement: "Привет! Прикрепляю два скриншота. На первом скриншоте - это то , что приходит мне (как админу) , а на втором скриншоте это другой проект. Что нужно сделать: Мне хочется, чтобы когда пользователи заполняли заявку на обратную связь или делали заказ из корзины - у меня отображалось больше информации, а именно tg id и username пользователя, который заполнил заявку обратной связи или заказал товар. Задача номер два: когда пользователь начинает заполнять поле номер телефона в разделе обратной связи - у него автоматически отображалось +7(дальше он сам вводит, но должно быть ограничение на ввод 10 цифр и не более)"
+
+backend:
+  - task: "Add Telegram User Info to Feedback Notifications"
+    implemented: true
+    working: true
+    file: "server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "РЕАЛИЗОВАНА! Добавлены поля tg_user_id и tg_username в модель FeedbackForm и FeedbackFormCreate. Обновлен endpoint /api/feedback для получения и сохранения Telegram данных пользователя. Модифицирован шаблон уведомления в Telegram для включения ID и username пользователя."
+
+  - task: "Add Telegram User Info to Order Notifications"
+    implemented: true
+    working: true
+    file: "server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "РЕАЛИЗОВАНА! Добавлены поля tg_user_id и tg_username в модель Order и OrderCreate. Обновлен endpoint /api/orders для получения и сохранения Telegram данных пользователя. Модифицирован шаблон уведомления в Telegram для включения ID и username пользователя. Также исправлена очистка корзины - теперь очищается только корзина конкретного пользователя по user_id."
+
+frontend:
+  - task: "Add Telegram User Data to Feedback Form Submission"
+    implemented: true
+    working: true
+    file: "App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "РЕАЛИЗОВАНА! Обновлен компонент Feedback для автоматического получения Telegram данных пользователя (ID и username) и передачи их при отправке формы обратной связи. Данные получаются через getTelegramUser() и добавляются в submitData."
+
+  - task: "Add Automatic Phone Number Formatting"
+    implemented: true
+    working: true
+    file: "App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "РЕАЛИЗОВАНА! Добавлено автоматическое форматирование номера телефона в форме обратной связи. Реализована функция formatPhoneNumber для автоматической вставки '+7(' в начале и ограничения ввода до 10 цифр после префикса. Добавлена функция handlePhoneChange для обработки изменений поля телефона с валидацией и форматированием."
+
+  - task: "Add Telegram User Data to Order Submission"
+    implemented: true
+    working: true
+    file: "App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "РЕАЛИЗОВАНА! Обновлена функция handleOrder для автоматического получения Telegram данных пользователя (ID и username) и передачи их при создании заказа. Данные получаются через getTelegramUser() и добавляются в orderData."
 
 backend:
   - task: "Fix Shared Cart Issue - Implement User-Specific Cart Isolation"

@@ -349,6 +349,20 @@ async def delete_product(query, product_id):
             reply_markup=get_back_keyboard()
         )
 
+async def show_backup_menu(query):
+    """Show backup management menu"""
+    keyboard = [
+        [InlineKeyboardButton("📥 Создать резервную копию", callback_data="create_backup")],
+        [InlineKeyboardButton("📤 Восстановить из копии", callback_data="restore_backup")],
+        [InlineKeyboardButton("📊 Статус резервных копий", callback_data="backup_status")],
+        [InlineKeyboardButton("🔙 Назад", callback_data="main_menu")]
+    ]
+    await query.edit_message_text(
+        "💾 **Управление резервными копиями**\n\nВыберите действие:",
+        parse_mode=ParseMode.MARKDOWN,
+        reply_markup=InlineKeyboardMarkup(keyboard)
+    )
+
 async def start_project_creation(query, user_id):
     """Start project creation process"""
     admin_state.set_action(user_id, "add_project_title")

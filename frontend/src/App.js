@@ -1076,6 +1076,8 @@ function App() {
         return <Catalog onAddToCart={handleAddToCart} />;
       case 'about':
         return <About />;
+      case 'promotions':
+        return <Promotions />;
       case 'feedback':
         return <Feedback />;
       case 'cart':

@@ -32,10 +32,11 @@ const getTelegramUser = () => {
 };
 
 // Bottom Navigation Component
-const BottomNavigation = ({ activeSection, setActiveSection, cartCount }) => {
+const BottomNavigation = ({ activeSection, setActiveSection, cartCount, promotionsCount }) => {
   const menuItems = [
     { id: 'catalog', name: 'Каталог', icon: '🏪' },
     { id: 'about', name: 'О нас', icon: '📋' },
+    { id: 'promotions', name: 'Акции', icon: '🎁', badge: promotionsCount },
     { id: 'feedback', name: 'Связь', icon: '💬' },
     { id: 'cart', name: 'Корзина', icon: '🛒', badge: cartCount }
   ];

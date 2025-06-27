@@ -413,25 +413,25 @@ class TelegramBotAdminPanelTest(unittest.TestCase):
         print("✅ Contact info button correctly displays contact information")
 
     @patch('telegram_admin.check_admin_callback')
-    async def test_06_button_handler_manage_products(self, mock_check_admin_callback):
-        """Test button handler for manage products"""
-        print("\n🔍 Testing button handler for manage products...")
+    async def test_08_button_handler_main_menu(self, mock_check_admin_callback):
+        """Test button handler for main menu"""
+        print("\n🔍 Testing button handler for main menu...")
         
         # Mock check_admin_callback to return True
         mock_check_admin_callback.return_value = True
         
         # Set up callback query data
-        self.mock_query.data = "manage_products"
+        self.mock_query.data = "main_menu"
         
         # Call button_handler
         await self.telegram_admin.button_handler(self.mock_update, self.mock_context)
         
-        # Check if products menu was displayed
+        # Check if main menu was displayed
         self.mock_query.edit_message_text.assert_called()
         call_args = self.mock_query.edit_message_text.call_args[0][0]
-        self.assertIn("Управление товарами", call_args)
+        self.assertIn("Админ панель КЛИМАТ ТЕХНО", call_args)
         
-        print("✅ Button handler correctly displays products management menu")
+        print("✅ Button handler correctly displays main menu")
 
     @patch('telegram_admin.check_admin_callback')
     async def test_07_button_handler_manage_projects(self, mock_check_admin_callback):

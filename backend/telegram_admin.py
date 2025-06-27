@@ -338,18 +338,138 @@ async def show_backup_status(query):
             reply_markup=get_back_keyboard()
         )
 
-async def confirm_restore_backup(query):
-    """Confirm backup restoration"""
+async def show_backup_status(query):
+    """Show backup status"""
+    if DatabaseBackup is None:
+        await query.edit_message_text(
+            "❌ Модуль резервного копирования недоступен",
+            reply_markup=get_back_keyboard()
+        )
+        return
+    
+    try:
+        backup = DatabaseBackup()
+        status = await backup.get_database_status()
+        
+        text = "📊 **Статус базы данных:**\n\n"
+        for collection, count in status.items():
+            if collection not in ['total', 'has_data']:
+                text += f"📋 {collection}: {count} записей\n"
+        
+        text += f"\n📈 **Всего записей:** {status.get('total', 0)}"
+        text += f"\n🔄 **Статус:** {'База заполнена' if status.get('has_data', False) else 'База пуста'}"
+        
+        await backup.close()
+        await query.edit_message_text(
+            text,
+            parse_mode=ParseMode.MARKDOWN,
+            reply_markup=get_back_keyboard()
+        )
+    except Exception as e:
+        await query.edit_message_text(
+            f"❌ Ошибка при получении статуса: {str(e)}",
+            reply_markup=get_back_keyboard()
+        )
+
+async def create_backup_handler(query):
+    """Handle backup creation"""
+    if DatabaseBackup is None:
+        await query.edit_message_text(
+            "❌ Модуль резервного копирования недоступен",
+            reply_markup=get_back_keyboard()
+        )
+        return
+    
+    try:
+        await query.edit_message_text(
+            "⏳ Создание резервной копии...",
+            reply_markup=None
+        )
+        
+        backup = DatabaseBackup()
+        success = await backup.create_backup()
+        await backup.close()
+        
+        if success:
+            await query.edit_message_text(
+                "✅ **Резервная копия создана успешно!**\n\n"
+                "📁 Данные сохранены в папке /backend/data/\n"
+                "🕐 Время создания: " + datetime.now().strftime('%d.%m.%Y %H:%M'),
+                parse_mode=ParseMode.MARKDOWN,
+                reply_markup=get_back_keyboard()
+            )
+        else:
+            await query.edit_message_text(
+                "❌ Ошибка при создании резервной копии",
+                reply_markup=get_back_keyboard()
+            )
+    except Exception as e:
+        await query.edit_message_text(
+            f"❌ Ошибка при создании резервной копии: {str(e)}",
+            reply_markup=get_back_keyboard()
+        )
+
+async def restore_backup_handler(query):
+    """Handle backup restoration"""
+    if DatabaseBackup is None:
+        await query.edit_message_text(
+            "❌ Модуль резервного копирования недоступен",
+            reply_markup=get_back_keyboard()
+        )
+        return
+    
     keyboard = [
-        [InlineKeyboardButton("✅ Да, восстановить", callback_data="execute_restore")],
+        [InlineKeyboardButton("✅ Да, восстановить", callback_data="confirm_restore_backup")],
         [InlineKeyboardButton("❌ Нет, отменить", callback_data="backup_menu")]
     ]
+    
     await query.edit_message_text(
-        "⚠️ **Внимание!**\n\nВосстановление резервной копии перезапишет все текущие данные. "
-        "Этот процесс нельзя отменить.\n\nПродолжить?",
+        "⚠️ **Внимание!**\n\n"
+        "Восстановление резервной копии заменит все текущие данные в базе данных "
+        "на данные из резервной копии.\n\n"
+        "🔄 Этот процесс нельзя отменить!\n\n"
+        "Продолжить восстановление?",
         parse_mode=ParseMode.MARKDOWN,
         reply_markup=InlineKeyboardMarkup(keyboard)
     )
+
+async def confirm_restore_backup(query):
+    """Execute backup restoration"""
+    if DatabaseBackup is None:
+        await query.edit_message_text(
+            "❌ Модуль резервного копирования недоступен",
+            reply_markup=get_back_keyboard()
+        )
+        return
+    
+    try:
+        await query.edit_message_text(
+            "⏳ Восстановление из резервной копии...",
+            reply_markup=None
+        )
+        
+        backup = DatabaseBackup()
+        success = await backup.restore_backup()
+        await backup.close()
+        
+        if success:
+            await query.edit_message_text(
+                "✅ **Данные восстановлены успешно!**\n\n"
+                "🔄 База данных восстановлена из резервной копии\n"
+                "🕐 Время восстановления: " + datetime.now().strftime('%d.%m.%Y %H:%M'),
+                parse_mode=ParseMode.MARKDOWN,
+                reply_markup=get_back_keyboard()
+            )
+        else:
+            await query.edit_message_text(
+                "❌ Ошибка при восстановлении данных",
+                reply_markup=get_back_keyboard()
+            )
+    except Exception as e:
+        await query.edit_message_text(
+            f"❌ Ошибка при восстановлении: {str(e)}",
+            reply_markup=get_back_keyboard()
+        )
 
 async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Handle button clicks"""

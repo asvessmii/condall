@@ -862,9 +862,15 @@ function App() {
     
     console.log('Telegram User:', user);
     
-    fetchCartItems();
     // initializeData(); // Убираем автоматическую инициализацию
   }, []);
+
+  // Load cart items when telegramUser is available
+  useEffect(() => {
+    if (telegramUser !== null) {
+      fetchCartItems();
+    }
+  }, [telegramUser]);
 
   const initializeData = async () => {
     // Функция отключена - данные инициализируются вручную

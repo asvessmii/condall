@@ -928,7 +928,9 @@ function App() {
 
   const handleRemoveFromCart = async (itemId) => {
     try {
-      await axios.delete(`${API}/cart/${itemId}`);
+      // Get user_id from telegram or use fallback
+      const userId = telegramUser?.id || 'guest_user';
+      await axios.delete(`${API}/cart/${itemId}?user_id=${userId}`);
       fetchCartItems();
     } catch (error) {
       console.error('Ошибка удаления из корзины:', error);

@@ -131,6 +131,9 @@ backend:
       - working: "NA"
         agent: "main"
         comment: "РЕАЛИЗОВАНА! Добавлены поля tg_user_id и tg_username в модель Order и OrderCreate. Обновлен endpoint /api/orders для получения и сохранения Telegram данных пользователя. Модифицирован шаблон уведомления в Telegram для включения ID и username пользователя. Также исправлена очистка корзины - теперь очищается только корзина конкретного пользователя по user_id."
+      - working: true
+        agent: "testing"
+        comment: "Тестирование подтвердило корректную работу API /api/orders с Telegram данными пользователя. Проверено: 1) API принимает запросы без Telegram данных (обратная совместимость), 2) API принимает запросы с Telegram данными (tg_user_id и tg_username), 3) Данные корректно сохраняются в MongoDB, 4) Структура данных в БД соответствует новой модели Order, 5) Корзина пользователя корректно очищается после создания заказа. Все тесты успешно пройдены."
 
 frontend:
   - task: "Add Telegram User Data to Feedback Form Submission"

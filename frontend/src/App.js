@@ -1043,6 +1043,12 @@ function App() {
     const user = getTelegramUser();
     setTelegramUser(user);
     
+    // Check URL hash for navigation
+    const hash = window.location.hash.substring(1); // Remove # from hash
+    if (hash && ['catalog', 'about', 'promotions', 'feedback', 'cart'].includes(hash)) {
+      setActiveSection(hash);
+    }
+    
     console.log('Telegram User:', user);
     
     // initializeData(); // Убираем автоматическую инициализацию

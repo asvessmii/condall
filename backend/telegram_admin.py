@@ -1043,6 +1043,7 @@ def main():
         
         # Add handlers
         application.add_handler(CommandHandler("start", start_command))
+        application.add_handler(CommandHandler("admin", admin_command))
         application.add_handler(CallbackQueryHandler(button_handler))
         application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, message_handler))
         application.add_handler(MessageHandler(filters.PHOTO, photo_handler))

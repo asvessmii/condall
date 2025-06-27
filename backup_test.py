@@ -215,9 +215,10 @@ class DatabaseBackupTest(unittest.TestCase):
         print("✅ Backup files were created successfully")
         
         # Verify backup files on disk
-        products_file = self.backup_dir / "products.json"
-        projects_file = self.backup_dir / "projects.json"
-        info_file = self.backup_dir / "backup_info.json"
+        backup_dir = Path('/app/backend/data')
+        products_file = backup_dir / "products.json"
+        projects_file = backup_dir / "projects.json"
+        info_file = backup_dir / "backup_info.json"
         
         self.assertTrue(products_file.exists(), "Products backup file does not exist on disk")
         self.assertTrue(projects_file.exists(), "Projects backup file does not exist on disk")
@@ -242,7 +243,7 @@ class DatabaseBackupTest(unittest.TestCase):
         
         test_product_found = False
         for product in products_data:
-            if product.get("id") == self.test_product["id"]:
+            if product.get("id") == self.test_product_id:
                 test_product_found = True
                 break
         
@@ -255,7 +256,7 @@ class DatabaseBackupTest(unittest.TestCase):
         
         test_project_found = False
         for project in projects_data:
-            if project.get("id") == self.test_project["id"]:
+            if project.get("id") == self.test_project_id:
                 test_project_found = True
                 break
         

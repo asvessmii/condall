@@ -310,9 +310,9 @@ async def run_async_tests():
         # Run tests in sequence
         await test.test_02_create_backup_api()
         await test.test_03_restore_backup_api()
-    finally:
-        # Clean up
-        test.tearDown()
+    except Exception as e:
+        print(f"Error during async tests: {e}")
+        raise
 
 if __name__ == '__main__':
     print(f"🚀 Testing Database Backup and Restore API at: {API_URL}")

@@ -784,7 +784,16 @@ const Cart = ({ cartItems, onRemoveItem, onUpdateQuantity, onClearCart }) => {
   const handleOrder = async () => {
     setIsOrdering(true);
     try {
-      await axios.post(`${API}/orders`, { items: cartItems });
+      // Get Telegram user data
+      const telegramUser = getTelegramUser();
+      
+      const orderData = {
+        items: cartItems,
+        tg_user_id: telegramUser?.id?.toString() || null,
+        tg_username: telegramUser?.username || null
+      };
+      
+      await axios.post(`${API}/orders`, orderData);
       setShowConfirmation(false);
       onClearCart();
       alert('Спасибо за заказ! Мы свяжемся с вами для подтверждения.');

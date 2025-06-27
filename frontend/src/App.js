@@ -879,7 +879,9 @@ function App() {
 
   const fetchCartItems = async () => {
     try {
-      const response = await axios.get(`${API}/cart`);
+      // Get user_id from telegram or use fallback
+      const userId = telegramUser?.id || 'guest_user';
+      const response = await axios.get(`${API}/cart?user_id=${userId}`);
       setCartItems(response.data);
     } catch (error) {
       console.error('Ошибка загрузки корзины:', error);

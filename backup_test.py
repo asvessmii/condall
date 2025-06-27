@@ -91,18 +91,26 @@ class DatabaseBackupTest(unittest.TestCase):
         """Clean up test data from MongoDB"""
         print("\n🔍 Cleaning up test data...")
         
-        # Delete test product
-        await self.db.products.delete_one({"id": self.test_product['id']})
-        print(f"✅ Test product deleted with ID: {self.test_product['id']}")
+        # Create MongoDB client
+        client = AsyncIOMotorClient(MONGO_URL)
+        db = client[DB_NAME]
         
-        # Delete test project
-        await self.db.projects.delete_one({"id": self.test_project['id']})
-        print(f"✅ Test project deleted with ID: {self.test_project['id']}")
-        
-        # Count documents
-        products_count = await self.db.products.count_documents({})
-        projects_count = await self.db.projects.count_documents({})
-        print(f"✅ Database now has {products_count} products and {projects_count} projects")
+        try:
+            # Delete test product
+            await db.products.delete_one({"id": self.test_product['id']})
+            print(f"✅ Test product deleted with ID: {self.test_product['id']}")
+            
+            # Delete test project
+            await db.projects.delete_one({"id": self.test_project['id']})
+            print(f"✅ Test project deleted with ID: {self.test_project['id']}")
+            
+            # Count documents
+            products_count = await db.products.count_documents({})
+            projects_count = await db.projects.count_documents({})
+            print(f"✅ Database now has {products_count} products and {projects_count} projects")
+        finally:
+            # Close connection
+            client.close()
     
     def test_01_backup_status_api(self):
         """Test the backup status API endpoint"""

@@ -67,7 +67,7 @@ const BottomNavigation = ({ activeSection, setActiveSection, cartCount, promotio
 };
 
 // Header Component
-const Header = ({ title = "КЛИМАТ ТЕХНО" }) => {
+const Header = ({ title = "COMFORT КЛИМАТ" }) => {
   return (
     <header className="app-header">
       <div className="header-content">

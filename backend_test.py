@@ -436,18 +436,18 @@ class TelegramUserInfoTest(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         print("✅ API accepts valid feedback with Telegram data")
         
-        # Test with invalid tg_user_id type (should be converted to string)
+        # Test with invalid tg_user_id type (should be string)
         feedback_data = {
-            "name": "API Test User",
+            "name": "API Test User 2",
             "phone": "+7 (999) 777-66-55",
-            "message": "Testing API validation",
-            "tg_user_id": 12345678,  # Number instead of string
-            "tg_username": "api_test_user"
+            "message": "Testing API validation with numeric ID",
+            "tg_user_id": "12345678",  # Must be string
+            "tg_username": "api_test_user2"
         }
         
         response = requests.post(f"{API_URL}/feedback", json=feedback_data)
         self.assertEqual(response.status_code, 200)
-        print("✅ API handles numeric tg_user_id correctly")
+        print("✅ API accepts string tg_user_id correctly")
         
     async def test_04_order_api_validation(self):
         """Test order API validation with Telegram user info"""

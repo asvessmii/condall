@@ -684,7 +684,7 @@ const Feedback = () => {
       };
       
       await axios.post(`${API}/feedback`, submitData);
-      setFormData({ name: '', phone: '', message: '' });
+      setFormData({ name: '', phone: '+7(', message: '' });
       setShowSuccess(true);
       setTimeout(() => setShowSuccess(false), 5000);
     } catch (error) {

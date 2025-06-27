@@ -187,6 +187,170 @@ async def admin_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 
+async def show_products_menu(query):
+    """Show products management menu"""
+    await query.edit_message_text(
+        "📦 **Управление товарами**\n\nВыберите действие:",
+        parse_mode=ParseMode.MARKDOWN,
+        reply_markup=get_products_menu_keyboard()
+    )
+
+async def start_product_creation(query, user_id):
+    """Start product creation process"""
+    admin_state.set_action(user_id, "add_product_name")
+    admin_state.set_state(user_id, "new_product", {})
+    await query.edit_message_text(
+        "➕ **Добавление нового товара**\n\n📝 Введите название товара:",
+        parse_mode=ParseMode.MARKDOWN
+    )
+
+async def show_products_list(query, action_type):
+    """Show list of products for editing or deletion"""
+    products = await db.products.find().to_list(1000)
+    
+    if not products:
+        await query.edit_message_text(
+            "❌ Товары не найдены",
+            reply_markup=get_back_keyboard()
+        )
+        return
+    
+    keyboard = []
+    for product in products:
+        button_text = f"{'📝' if action_type == 'edit' else '🗑️'} {product['name']}"
+        callback_data = f"{'edit' if action_type == 'edit' else 'delete'}_product_{product['id']}"
+        keyboard.append([InlineKeyboardButton(button_text, callback_data=callback_data)])
+    keyboard.append([InlineKeyboardButton("🔙 Назад", callback_data="manage_products")])
+    
+    await query.edit_message_text(
+        f"{'📝' if action_type == 'edit' else '🗑️'} **Выберите товар:**",
+        parse_mode=ParseMode.MARKDOWN,
+        reply_markup=InlineKeyboardMarkup(keyboard)
+    )
+
+async def delete_product_confirm(query, product_id):
+    """Show confirmation for product deletion"""
+    product = await db.products.find_one({"id": product_id})
+    if not product:
+        await query.answer("❌ Товар не найден", show_alert=True)
+        return
+    
+    keyboard = [
+        [InlineKeyboardButton("✅ Да, удалить", callback_data=f"confirm_delete_product_{product_id}")],
+        [InlineKeyboardButton("❌ Нет, отменить", callback_data="manage_products")]
+    ]
+    
+    await query.edit_message_text(
+        f"🗑️ Вы уверены, что хотите удалить товар '{product['name']}'?",
+        reply_markup=InlineKeyboardMarkup(keyboard)
+    )
+
+async def show_backup_menu(query):
+    """Show backup management menu"""
+    keyboard = [
+        [InlineKeyboardButton("📥 Создать резервную копию", callback_data="create_backup")],
+        [InlineKeyboardButton("📤 Восстановить из копии", callback_data="restore_backup")],
+        [InlineKeyboardButton("📊 Статус резервных копий", callback_data="backup_status")],
+        [InlineKeyboardButton("🔙 Назад", callback_data="main_menu")]
+    ]
+    await query.edit_message_text(
+        "💾 **Управление резервными копиями**\n\nВыберите действие:",
+        parse_mode=ParseMode.MARKDOWN,
+        reply_markup=InlineKeyboardMarkup(keyboard)
+    )
+
+async def create_backup_handler(query):
+    """Handle backup creation"""
+    if DatabaseBackup is None:
+        await query.edit_message_text(
+            "❌ Модуль резервного копирования недоступен",
+            reply_markup=get_back_keyboard()
+        )
+        return
+    
+    try:
+        backup = DatabaseBackup()
+        filename = await backup.create_backup()
+        await query.edit_message_text(
+            f"✅ Резервная копия создана успешно!\nФайл: {filename}",
+            reply_markup=get_back_keyboard()
+        )
+    except Exception as e:
+        await query.edit_message_text(
+            f"❌ Ошибка при создании резервной копии: {str(e)}",
+            reply_markup=get_back_keyboard()
+        )
+
+async def restore_backup_handler(query):
+    """Handle backup restoration"""
+    if DatabaseBackup is None:
+        await query.edit_message_text(
+            "❌ Модуль резервного копирования недоступен",
+            reply_markup=get_back_keyboard()
+        )
+        return
+    
+    try:
+        backup = DatabaseBackup()
+        backups = await backup.list_backups()
+        if not backups:
+            await query.edit_message_text(
+                "❌ Резервные копии не найдены",
+                reply_markup=get_back_keyboard()
+            )
+            return
+        
+        keyboard = []
+        for b in backups:
+            keyboard.append([InlineKeyboardButton(b, callback_data=f"restore_{b}")])
+        keyboard.append([InlineKeyboardButton("🔙 Назад", callback_data="backup_menu")])
+        
+        await query.edit_message_text(
+            "📤 Выберите резервную копию для восстановления:",
+            reply_markup=InlineKeyboardMarkup(keyboard)
+        )
+    except Exception as e:
+        await query.edit_message_text(
+            f"❌ Ошибка при получении списка резервных копий: {str(e)}",
+            reply_markup=get_back_keyboard()
+        )
+
+async def show_backup_status(query):
+    """Show backup status"""
+    if DatabaseBackup is None:
+        await query.edit_message_text(
+            "❌ Модуль резервного копирования недоступен",
+            reply_markup=get_back_keyboard()
+        )
+        return
+    
+    try:
+        backup = DatabaseBackup()
+        status = await backup.get_status()
+        await query.edit_message_text(
+            f"📊 **Статус резервных копий**\n\n{status}",
+            parse_mode=ParseMode.MARKDOWN,
+            reply_markup=get_back_keyboard()
+        )
+    except Exception as e:
+        await query.edit_message_text(
+            f"❌ Ошибка при получении статуса: {str(e)}",
+            reply_markup=get_back_keyboard()
+        )
+
+async def confirm_restore_backup(query):
+    """Confirm backup restoration"""
+    keyboard = [
+        [InlineKeyboardButton("✅ Да, восстановить", callback_data="execute_restore")],
+        [InlineKeyboardButton("❌ Нет, отменить", callback_data="backup_menu")]
+    ]
+    await query.edit_message_text(
+        "⚠️ **Внимание!**\n\nВосстановление резервной копии перезапишет все текущие данные. "
+        "Этот процесс нельзя отменить.\n\nПродолжить?",
+        parse_mode=ParseMode.MARKDOWN,
+        reply_markup=InlineKeyboardMarkup(keyboard)
+    )
+
 async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Handle button clicks"""
     query = update.callback_query

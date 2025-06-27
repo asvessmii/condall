@@ -167,7 +167,7 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     logger.info(f"User started bot: ID={user_id}, Username=@{username}, Name={first_name}")
     
     welcome_text = """
-🏪 **Добро пожаловать в КЛИМАТ ТЕХНО**
+🏪 **Добро пожаловать в COMFORT КЛИМАТ**
 
 Интернет-магазин кондиционеров и климатической техники!
 

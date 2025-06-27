@@ -319,7 +319,173 @@ class AirConditionerShopAPITest(unittest.TestCase):
         self.assertEqual(len(cart_items), 0)
         print("✅ Cart is cleared after order creation")
 
-class TelegramBotAdminPanelTest(unittest.TestCase):
+class TelegramUserInfoTest(unittest.TestCase):
+    """Test suite for Telegram User Info in Feedback and Orders"""
+
+    def setUp(self):
+        """Initialize test data"""
+        self.client = AsyncIOMotorClient(MONGO_URL)
+        self.db = self.client[DB_NAME]
+        
+    def tearDown(self):
+        """Clean up after tests"""
+        self.client.close()
+
+    async def test_01_feedback_schema(self):
+        """Test feedback schema with Telegram user info"""
+        print("\n🔍 Testing feedback schema with Telegram user info...")
+        
+        # Create test feedback with Telegram data
+        feedback_id = str(uuid.uuid4())
+        test_feedback = {
+            "id": feedback_id,
+            "name": "Schema Test User",
+            "phone": "+7 (999) 888-77-66",
+            "message": "Testing feedback schema with Telegram data",
+            "tg_user_id": "123456789",
+            "tg_username": "schema_test_user",
+            "created_at": datetime.utcnow()
+        }
+        
+        # Insert test feedback
+        await self.db.feedback.insert_one(test_feedback)
+        print("✅ Test feedback created")
+        
+        # Retrieve and verify
+        feedback = await self.db.feedback.find_one({"id": feedback_id})
+        self.assertIsNotNone(feedback)
+        self.assertEqual(feedback["tg_user_id"], "123456789")
+        self.assertEqual(feedback["tg_username"], "schema_test_user")
+        print("✅ Feedback schema includes Telegram user info fields")
+        
+        # Clean up
+        await self.db.feedback.delete_one({"id": feedback_id})
+        print("✅ Test feedback deleted")
+        
+    async def test_02_order_schema(self):
+        """Test order schema with Telegram user info"""
+        print("\n🔍 Testing order schema with Telegram user info...")
+        
+        # Create test order with Telegram data
+        order_id = str(uuid.uuid4())
+        test_order = {
+            "id": order_id,
+            "items": [
+                {
+                    "id": str(uuid.uuid4()),
+                    "user_id": "test_user_id",
+                    "product_id": str(uuid.uuid4()),
+                    "product_name": "Test Product",
+                    "price": 1000.0,
+                    "quantity": 1,
+                    "created_at": datetime.utcnow()
+                }
+            ],
+            "total_amount": 1000.0,
+            "tg_user_id": "987654321",
+            "tg_username": "order_schema_test",
+            "created_at": datetime.utcnow(),
+            "status": "pending"
+        }
+        
+        # Insert test order
+        await self.db.orders.insert_one(test_order)
+        print("✅ Test order created")
+        
+        # Retrieve and verify
+        order = await self.db.orders.find_one({"id": order_id})
+        self.assertIsNotNone(order)
+        self.assertEqual(order["tg_user_id"], "987654321")
+        self.assertEqual(order["tg_username"], "order_schema_test")
+        print("✅ Order schema includes Telegram user info fields")
+        
+        # Clean up
+        await self.db.orders.delete_one({"id": order_id})
+        print("✅ Test order deleted")
+        
+    async def test_03_feedback_api_validation(self):
+        """Test feedback API validation with Telegram user info"""
+        print("\n🔍 Testing feedback API validation with Telegram user info...")
+        
+        # Test with valid data
+        feedback_data = {
+            "name": "API Test User",
+            "phone": "+7 (999) 777-66-55",
+            "message": "Testing API validation",
+            "tg_user_id": "11223344",
+            "tg_username": "api_test_user"
+        }
+        
+        response = requests.post(f"{API_URL}/feedback", json=feedback_data)
+        self.assertEqual(response.status_code, 200)
+        print("✅ API accepts valid feedback with Telegram data")
+        
+        # Test with invalid tg_user_id type (should be converted to string)
+        feedback_data = {
+            "name": "API Test User",
+            "phone": "+7 (999) 777-66-55",
+            "message": "Testing API validation",
+            "tg_user_id": 12345678,  # Number instead of string
+            "tg_username": "api_test_user"
+        }
+        
+        response = requests.post(f"{API_URL}/feedback", json=feedback_data)
+        self.assertEqual(response.status_code, 200)
+        print("✅ API handles numeric tg_user_id correctly")
+        
+    async def test_04_order_api_validation(self):
+        """Test order API validation with Telegram user info"""
+        print("\n🔍 Testing order API validation with Telegram user info...")
+        
+        # First add items to cart
+        response = requests.get(f"{API_URL}/products")
+        products = response.json()
+        if not products:
+            self.fail("No products available to test order")
+        
+        product = products[0]
+        
+        # Generate a unique user_id for this test
+        test_user_id = f"test_user_{uuid.uuid4().hex[:8]}"
+        
+        # Add to cart
+        cart_data = {
+            "user_id": test_user_id,
+            "product_id": product['id'],
+            "quantity": 1
+        }
+        response = requests.post(f"{API_URL}/cart", json=cart_data)
+        
+        # Get cart
+        response = requests.get(f"{API_URL}/cart", params={"user_id": test_user_id})
+        cart_items = response.json()
+        
+        # Test with valid data
+        order_data = {
+            "items": cart_items,
+            "tg_user_id": "55667788",
+            "tg_username": "order_api_test"
+        }
+        
+        response = requests.post(f"{API_URL}/orders", json=order_data)
+        self.assertEqual(response.status_code, 200)
+        print("✅ API accepts valid order with Telegram data")
+        
+        # Add to cart again for second test
+        response = requests.post(f"{API_URL}/cart", json=cart_data)
+        response = requests.get(f"{API_URL}/cart", params={"user_id": test_user_id})
+        cart_items = response.json()
+        
+        # Test with invalid tg_user_id type (should be converted to string)
+        order_data = {
+            "items": cart_items,
+            "tg_user_id": 87654321,  # Number instead of string
+            "tg_username": "order_api_test"
+        }
+        
+        response = requests.post(f"{API_URL}/orders", json=order_data)
+        self.assertEqual(response.status_code, 200)
+        print("✅ API handles numeric tg_user_id correctly")
     """Test suite for the Telegram Bot Admin Panel"""
 
     @classmethod

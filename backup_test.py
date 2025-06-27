@@ -241,58 +241,66 @@ class DatabaseBackupTest(unittest.TestCase):
         """Test the restore backup API endpoint"""
         print("\n🔍 Testing restore backup API...")
         
-        # First clean up test data
-        await self.clean_test_data()
+        # Create MongoDB client
+        client = AsyncIOMotorClient(MONGO_URL)
+        db = client[DB_NAME]
         
-        # Verify test data is gone
-        product = await self.db.products.find_one({"id": self.test_product["id"]})
-        project = await self.db.projects.find_one({"id": self.test_project["id"]})
-        
-        self.assertIsNone(product, "Test product still exists after cleanup")
-        self.assertIsNone(project, "Test project still exists after cleanup")
-        print("✅ Test data successfully cleaned up")
-        
-        # Get initial counts
-        initial_products_count = await self.db.products.count_documents({})
-        initial_projects_count = await self.db.projects.count_documents({})
-        print(f"✅ Initial counts: {initial_products_count} products, {initial_projects_count} projects")
-        
-        # Restore backup
-        response = requests.post(f"{API_URL}/backup/restore")
-        self.assertEqual(response.status_code, 200)
-        
-        data = response.json()
-        print(f"✅ Restore backup API response: {json.dumps(data, indent=2)}")
-        
-        # Verify response structure
-        self.assertIn("message", data)
-        self.assertIn("products_count", data)
-        self.assertIn("projects_count", data)
-        
-        # Wait a moment for restore to complete
-        time.sleep(2)
-        
-        # Verify test data is restored
-        product = await self.db.products.find_one({"id": self.test_product["id"]})
-        project = await self.db.projects.find_one({"id": self.test_project["id"]})
-        
-        self.assertIsNotNone(product, "Test product was not restored")
-        self.assertIsNotNone(project, "Test project was not restored")
-        
-        print("✅ Test data successfully restored")
-        
-        # Verify counts
-        final_products_count = await self.db.products.count_documents({})
-        final_projects_count = await self.db.projects.count_documents({})
-        print(f"✅ Final counts: {final_products_count} products, {final_projects_count} projects")
-        
-        # Verify counts match response
-        self.assertEqual(final_products_count, data["products_count"])
-        self.assertEqual(final_projects_count, data["projects_count"])
-        
-        print("✅ Database counts match response")
-        
-        return data
+        try:
+            # First clean up test data
+            await self.clean_test_data()
+            
+            # Verify test data is gone
+            product = await db.products.find_one({"id": self.test_product["id"]})
+            project = await db.projects.find_one({"id": self.test_project["id"]})
+            
+            self.assertIsNone(product, "Test product still exists after cleanup")
+            self.assertIsNone(project, "Test project still exists after cleanup")
+            print("✅ Test data successfully cleaned up")
+            
+            # Get initial counts
+            initial_products_count = await db.products.count_documents({})
+            initial_projects_count = await db.projects.count_documents({})
+            print(f"✅ Initial counts: {initial_products_count} products, {initial_projects_count} projects")
+            
+            # Restore backup
+            response = requests.post(f"{API_URL}/backup/restore")
+            self.assertEqual(response.status_code, 200)
+            
+            data = response.json()
+            print(f"✅ Restore backup API response: {json.dumps(data, indent=2)}")
+            
+            # Verify response structure
+            self.assertIn("message", data)
+            self.assertIn("products_count", data)
+            self.assertIn("projects_count", data)
+            
+            # Wait a moment for restore to complete
+            time.sleep(2)
+            
+            # Verify test data is restored
+            product = await db.products.find_one({"id": self.test_product["id"]})
+            project = await db.projects.find_one({"id": self.test_project["id"]})
+            
+            self.assertIsNotNone(product, "Test product was not restored")
+            self.assertIsNotNone(project, "Test project was not restored")
+            
+            print("✅ Test data successfully restored")
+            
+            # Verify counts
+            final_products_count = await db.products.count_documents({})
+            final_projects_count = await db.projects.count_documents({})
+            print(f"✅ Final counts: {final_products_count} products, {final_projects_count} projects")
+            
+            # Verify counts match response
+            self.assertEqual(final_products_count, data["products_count"])
+            self.assertEqual(final_projects_count, data["projects_count"])
+            
+            print("✅ Database counts match response")
+            
+            return data
+        finally:
+            # Close connection
+            client.close()
 
 async def run_async_tests():
     """Run the async test methods"""

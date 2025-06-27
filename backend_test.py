@@ -455,30 +455,25 @@ class TelegramBotAdminPanelTest(unittest.TestCase):
         print("✅ Button handler correctly displays products management menu")
 
     @patch('telegram_admin.check_admin_callback')
-    async def test_08_add_product_flow_start(self, mock_check_admin_callback):
-        """Test starting add product flow"""
-        print("\n🔍 Testing add product flow initialization...")
+    async def test_10_button_handler_manage_projects(self, mock_check_admin_callback):
+        """Test button handler for manage projects"""
+        print("\n🔍 Testing button handler for manage projects...")
         
         # Mock check_admin_callback to return True
         mock_check_admin_callback.return_value = True
         
         # Set up callback query data
-        self.mock_query.data = "add_product"
+        self.mock_query.data = "manage_projects"
         
         # Call button_handler
         await self.telegram_admin.button_handler(self.mock_update, self.mock_context)
         
-        # Check if add product prompt was displayed
+        # Check if projects menu was displayed
         self.mock_query.edit_message_text.assert_called()
         call_args = self.mock_query.edit_message_text.call_args[0][0]
-        self.assertIn("Добавление нового товара", call_args)
-        self.assertIn("Введите название товара", call_args)
+        self.assertIn("Управление проектами", call_args)
         
-        # Check if state was updated
-        user_id = self.admin_user.id
-        self.assertEqual(self.telegram_admin.admin_state.get_action(user_id), "add_product_name")
-        
-        print("✅ Add product flow correctly initialized")
+        print("✅ Button handler correctly displays projects management menu")
 
     @patch('telegram_admin.check_admin')
     async def test_09_add_product_message_handler(self, mock_check_admin):

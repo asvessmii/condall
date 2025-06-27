@@ -131,7 +131,37 @@ def get_back_keyboard():
 
 
 async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Start command handler"""
+    """Start command handler for regular users"""
+    user_id = update.effective_user.id
+    username = update.effective_user.username or "Unknown"
+    first_name = update.effective_user.first_name or "Unknown"
+    
+    # Log user info
+    logger.info(f"User started bot: ID={user_id}, Username=@{username}, Name={first_name}")
+    
+    welcome_text = """
+🏪 **Добро пожаловать в КЛИМАТ ТЕХНО**
+
+Интернет-магазин кондиционеров и климатической техники!
+
+🌐 Перейдите в наш каталог для выбора и заказа товаров:
+    """
+    
+    keyboard = [
+        [InlineKeyboardButton("🌐 Открыть каталог", web_app=WebAppInfo(url="https://6a1c6ce0-e5c2-4452-9423-39f29c6b04b5.preview.emergentagent.com"))],
+        [InlineKeyboardButton("📞 Связаться с нами", callback_data="contact_info")]
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    
+    await update.message.reply_text(
+        welcome_text,
+        parse_mode=ParseMode.MARKDOWN,
+        reply_markup=reply_markup
+    )
+
+
+async def admin_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Admin command handler"""
     if not await check_admin(update):
         return
     

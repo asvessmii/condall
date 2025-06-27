@@ -945,6 +945,10 @@ function App() {
   const [cartItems, setCartItems] = useState([]);
   const [telegramWebApp, setTelegramWebApp] = useState(null);
   const [telegramUser, setTelegramUser] = useState(null);
+  // States for promotions popup
+  const [showPromoPopup, setShowPromoPopup] = useState(false);
+  const [promotionsCount, setPromotionsCount] = useState(0);
+  const [popupAnimationClass, setPopupAnimationClass] = useState('');
 
   // Helper function to get user ID with fallback
   const getUserId = () => {

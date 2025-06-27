@@ -1134,6 +1134,7 @@ function App() {
         activeSection={activeSection} 
         setActiveSection={setActiveSection}
         cartCount={cartItems.length}
+        promotionsCount={promotionsCount}
       />
     </div>
   );

@@ -703,7 +703,7 @@ const Promotions = ({ promotionView, setPromotionView, onPromoNavigate }) => {
 };
 
 // Feedback Section
-const Feedback = () => {
+const Feedback = ({ shouldAutoFillPromo, setShouldAutoFillPromo }) => {
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
@@ -711,6 +711,14 @@ const Feedback = () => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+
+  // Auto-fill message if coming from promotion
+  useEffect(() => {
+    if (shouldAutoFillPromo) {
+      setFormData(prev => ({ ...prev, message: 'АКЦИЯ' }));
+      setShouldAutoFillPromo(false); // Reset the flag
+    }
+  }, [shouldAutoFillPromo, setShouldAutoFillPromo]);
 
   // Phone number formatting function
   const formatPhoneNumber = (value) => {

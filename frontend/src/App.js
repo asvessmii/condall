@@ -947,8 +947,7 @@ function App() {
 
   const handleUpdateQuantity = async (itemId, newQuantity) => {
     try {
-      // Get user_id from telegram or use fallback
-      const userId = telegramUser?.id || 'guest_user';
+      const userId = getUserId();
       
       const item = cartItems.find(item => item.id === itemId);
       if (item) {

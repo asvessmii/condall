@@ -49,20 +49,28 @@ class CartFunctionalityTest(unittest.TestCase):
     def test_01_get_products(self):
         """Test getting all products"""
         print("\n🔍 Testing GET /api/products endpoint...")
-        response = requests.get(f"{API_URL}/products")
-        self.assertEqual(response.status_code, 200, "Failed to get products")
-        
-        products = response.json()
-        self.assertIsInstance(products, list, "Products response is not a list")
-        self.assertGreater(len(products), 0, "No products returned")
-        
-        # Verify product structure
-        product = products[0]
-        required_fields = ['id', 'name', 'description', 'short_description', 'price', 'image_url', 'specifications']
-        for field in required_fields:
-            self.assertIn(field, product, f"Product missing required field: {field}")
-        
-        print(f"✅ GET /api/products returned {len(products)} products with valid structure")
+        try:
+            response = requests.get(f"{API_URL}/products")
+            print(f"Response status code: {response.status_code}")
+            print(f"Response content: {response.text[:200]}...")  # Print first 200 chars
+            
+            self.assertEqual(response.status_code, 200, "Failed to get products")
+            
+            products = response.json()
+            self.assertIsInstance(products, list, "Products response is not a list")
+            self.assertGreater(len(products), 0, "No products returned")
+            
+            # Verify product structure
+            product = products[0]
+            print(f"First product: {product['name']}")
+            required_fields = ['id', 'name', 'description', 'short_description', 'price', 'image_url', 'specifications']
+            for field in required_fields:
+                self.assertIn(field, product, f"Product missing required field: {field}")
+            
+            print(f"✅ GET /api/products returned {len(products)} products with valid structure")
+        except Exception as e:
+            print(f"❌ Error in test_01_get_products: {e}")
+            raise
 
     def test_02_empty_cart(self):
         """Test getting an empty cart"""

@@ -331,18 +331,24 @@ frontend:
 
 metadata:
   created_by: "main_agent"
-  version: "2.0"
-  test_sequence: 4
+  version: "3.0"
+  test_sequence: 5
   run_ui: false
 
 test_plan:
   current_focus:
-    - "Database Backup and Restore System"
+    - "Add Telegram User Info to Feedback Notifications"
+    - "Add Telegram User Info to Order Notifications"
+    - "Add Telegram User Data to Feedback Form Submission"
+    - "Add Automatic Phone Number Formatting"
+    - "Add Telegram User Data to Order Submission"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
 
 agent_communication:
+  - agent: "main"
+    message: "НОВЫЙ ФУНКЦИОНАЛ ПОЛНОСТЬЮ РЕАЛИЗОВАН! Выполнены все требования пользователя: 1) Добавлены поля tg_user_id и tg_username в модели FeedbackForm и Order для сохранения информации о пользователе Telegram, 2) Обновлены API endpoints /api/feedback и /api/orders для получения и обработки Telegram данных, 3) Модифицированы уведомления в Telegram для отображения ID и username пользователя, 4) Реализовано автоматическое форматирование номера телефона с префиксом '+7(' и ограничением до 10 цифр, 5) Frontend обновлен для автоматического получения и передачи Telegram данных пользователя. Все сервисы перезапущены и готовы к тестированию."
   - agent: "testing"
     message: "Completed testing of the Telegram Bot Admin Panel implementation. All tests passed successfully. The bot initializes correctly, authenticates admin users properly (only ID 7470811680 has access), and provides full CRUD operations for both products and projects. The main menu navigation works as expected, and all required dependencies are installed. The bot correctly handles image uploads and converts them to base64 format. All functionality is working as expected with no critical issues found."
   - agent: "user"

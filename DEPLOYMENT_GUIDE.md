@@ -13,7 +13,7 @@
 ## 🌐 ДОСТУП К САЙТУ
 
 ### Основной сайт:
-**URL**: https://b4ed057e-7f70-4c32-bc44-1592a6a375c9.preview.emergentagent.com
+**URL**: https://6a1c6ce0-e5c2-4452-9423-39f29c6b04b5.preview.emergentagent.com
 
 ### Функциональность сайта:
 - 📦 **Каталог товаров** - просмотр кондиционеров с характеристиками
@@ -71,7 +71,7 @@ sudo supervisorctl restart all
 - **Collections**: products, projects, orders, feedback, cart_items
 
 ### API Endpoints:
-- **Base URL**: https://b4ed057e-7f70-4c32-bc44-1592a6a375c9.preview.emergentagent.com/api
+- **Base URL**: https://6a1c6ce0-e5c2-4452-9423-39f29c6b04b5.preview.emergentagent.com/api
 - **Products**: GET/POST `/api/products`
 - **Projects**: GET/POST `/api/projects`
 - **Orders**: POST `/api/orders`
@@ -189,7 +189,7 @@ mongosh test_database --eval "db.products.find().count()"
 
 - **Telegram Admin ID**: 7470811680
 - **Bot Token**: 7575081951:AAHQ9kG-7_hKAgVTWYHWHzJ3UnWJRnEJX30
-- **Site URL**: https://b4ed057e-7f70-4c32-bc44-1592a6a375c9.preview.emergentagent.com
+- **Site URL**: https://6a1c6ce0-e5c2-4452-9423-39f29c6b04b5.preview.emergentagent.com
 
 ---
 

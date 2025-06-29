@@ -91,7 +91,7 @@ async def check_admin(update: Update) -> bool:
 def get_main_menu_keyboard():
     """Get main menu keyboard"""
     keyboard = [
-        [InlineKeyboardButton("🌐 Открыть сайт", web_app=WebAppInfo(url="https://9dda70b2-da78-4938-b724-97660dc76fa5.preview.emergentagent.com"))],
+        [InlineKeyboardButton("🌐 Открыть сайт", web_app=WebAppInfo(url="https://admin-dashboard-24.emergent.host"))],
         [InlineKeyboardButton("📦 Управление товарами", callback_data="manage_products")],
         [InlineKeyboardButton("🏗️ Управление проектами", callback_data="manage_projects")],
         [InlineKeyboardButton("💾 Резервные копии", callback_data="backup_menu")],
@@ -175,8 +175,8 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """
     
     keyboard = [
-        [InlineKeyboardButton("🌐 Открыть каталог", web_app=WebAppInfo(url="https://9dda70b2-da78-4938-b724-97660dc76fa5.preview.emergentagent.com"))],
-        [InlineKeyboardButton("📞 Связаться с нами", web_app=WebAppInfo(url="https://9dda70b2-da78-4938-b724-97660dc76fa5.preview.emergentagent.com#contact"))]
+        [InlineKeyboardButton("🌐 Открыть каталог", web_app=WebAppInfo(url="https://admin-dashboard-24.emergent.host"))],
+        [InlineKeyboardButton("📞 Связаться с нами", web_app=WebAppInfo(url="https://admin-dashboard-24.emergent.host/#contact"))]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     
